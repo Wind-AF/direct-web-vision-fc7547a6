@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { UserCheck, Check, Loader2 } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
+import { supabase } from "@/integrations/supabase/client";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -105,24 +106,65 @@ const Analise = () => {
   const [searchParams] = useSearchParams();
   const [step1, setStep1] = useState<StepState>("loading");
   const [step2, setStep2] = useState<StepState>("loading");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    const t1 = window.setTimeout(() => setStep1("done"), 1500);
-    const t2 = window.setTimeout(() => setStep2("done"), 3000);
-    const t3 = window.setTimeout(() => {
-      const cpf = searchParams.get("cpf") ?? "";
-      const nome = searchParams.get("nome") ?? "";
-      const qs = new URLSearchParams();
-      if (cpf) qs.set("cpf", cpf);
-      if (nome) qs.set("nome", nome);
-      const q = qs.toString();
-      navigate(`/pessoa${q ? `?${q}` : ""}`, { replace: true });
-    }, 3800);
+    let cancelled = false;
+    const cpf = searchParams.get("cpf") ?? "";
+    const nomeFromUrl = searchParams.get("nome") ?? "";
+
+    const startedAt = Date.now();
+    const minDelay = (ms: number) =>
+      new Promise<void>((r) =>
+        setTimeout(r, Math.max(0, ms - (Date.now() - startedAt))),
+      );
+
+    (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("consulta-cpf", {
+          body: { cpf },
+        });
+
+        await minDelay(1500);
+        if (cancelled) return;
+        setStep1("done");
+
+        if (error || !data?.ok) {
+          const msg =
+            (data && (data.error as string)) ||
+            error?.message ||
+            "Não foi possível consultar este CPF.";
+          await minDelay(2800);
+          if (cancelled) return;
+          setErrorMsg(msg);
+          return;
+        }
+
+        await minDelay(2800);
+        if (cancelled) return;
+        setStep2("done");
+
+        const qs = new URLSearchParams();
+        if (cpf) qs.set("cpf", cpf);
+        const finalNome = (data.nome as string) || nomeFromUrl;
+        if (finalNome) qs.set("nome", finalNome);
+        if (data.nascimento) qs.set("nascimento", data.nascimento as string);
+        if (data.sexo) qs.set("sexo", data.sexo as string);
+        if (data.mae) qs.set("mae", data.mae as string);
+
+        await minDelay(3500);
+        if (cancelled) return;
+        navigate(`/pessoa?${qs.toString()}`, { replace: true });
+      } catch (e) {
+        if (cancelled) return;
+        setErrorMsg(
+          e instanceof Error ? e.message : "Erro inesperado ao consultar CPF.",
+        );
+      }
+    })();
 
     return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.clearTimeout(t3);
+      cancelled = true;
     };
   }, [navigate, searchParams]);
 
@@ -291,6 +333,42 @@ const Analise = () => {
                 <Step label="Consultando banco de dados" state={step1} />
                 <Step label="Finalizando verificação" state={step2} />
               </div>
+
+              {errorMsg && (
+                <div
+                  style={{
+                    marginTop: 16,
+                    padding: 14,
+                    borderRadius: 12,
+                    background: "#FEF2F2",
+                    border: "1px solid #FECACA",
+                    color: "#991B1B",
+                    fontSize: 14,
+                  }}
+                >
+                  <strong style={{ display: "block", marginBottom: 4 }}>
+                    Não foi possível continuar
+                  </strong>
+                  <span style={{ color: "#7F1D1D" }}>{errorMsg}</span>
+                  <button
+                    onClick={() => navigate("/cpf")}
+                    style={{
+                      marginTop: 12,
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: 10,
+                      background: "#DC2626",
+                      color: "#FFFFFF",
+                      border: "none",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontFamily: fontStack,
+                    }}
+                  >
+                    Tentar outro CPF
+                  </button>
+                </div>
+              )}
 
               {/* Secure connection badge */}
               <div style={{ marginTop: 24, textAlign: "center" }}>
