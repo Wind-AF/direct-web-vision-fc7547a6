@@ -103,12 +103,30 @@ const Pessoa = () => {
   const [phone, setPhone] = useState("");
 
   const nomeParam = (searchParams.get("nome") || "").trim();
+  const nascimentoParam = (searchParams.get("nascimento") || "").trim();
+  const sexoParam = (searchParams.get("sexo") || "").trim();
+  const maeParam = (searchParams.get("mae") || "").trim();
+
+  // Normaliza data para DD/MM/AAAA quando vier como AAAA-MM-DD
+  const formatBirth = (raw: string) => {
+    if (!raw) return PERSON_DEFAULT.birthDate;
+    const iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (iso) return `${iso[3]}/${iso[2]}/${iso[1]}`;
+    return raw;
+  };
+
+  // Normaliza sexo para apenas a primeira letra (M / F)
+  const formatSex = (raw: string) => {
+    if (!raw) return PERSON_DEFAULT.sex;
+    return raw.trim().charAt(0).toUpperCase();
+  };
+
   const PERSON = {
     firstName: (nomeParam.split(" ")[0] || "FRANCISCO").toUpperCase(),
     fullName: (nomeParam || PERSON_DEFAULT.fullName).toUpperCase(),
-    birthDate: PERSON_DEFAULT.birthDate,
-    sex: PERSON_DEFAULT.sex,
-    motherName: PERSON_DEFAULT.motherName,
+    birthDate: formatBirth(nascimentoParam),
+    sex: formatSex(sexoParam),
+    motherName: (maeParam || PERSON_DEFAULT.motherName).toUpperCase(),
   };
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
