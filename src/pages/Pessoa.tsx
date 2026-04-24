@@ -6,8 +6,7 @@ import logo from "@/assets/bancred-logo.png";
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 // Mock person data (replicating visual only — no backend)
-const PERSON = {
-  firstName: "FRANCISCO",
+const PERSON_DEFAULT = {
   fullName: "FRANCISCO VALDEMIR VIEIRA FILHO",
   birthDate: "05/02/2004",
   sex: "M",
@@ -103,6 +102,15 @@ const Pessoa = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
 
+  const nomeParam = (searchParams.get("nome") || "").trim();
+  const PERSON = {
+    firstName: (nomeParam.split(" ")[0] || "FRANCISCO").toUpperCase(),
+    fullName: (nomeParam || PERSON_DEFAULT.fullName).toUpperCase(),
+    birthDate: PERSON_DEFAULT.birthDate,
+    sex: PERSON_DEFAULT.sex,
+    motherName: PERSON_DEFAULT.motherName,
+  };
+
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPhoneValid = phone.replace(/\D/g, "").length >= 10;
   const canSubmit = isEmailValid && isPhoneValid;
@@ -111,7 +119,10 @@ const Pessoa = () => {
     e.preventDefault();
     if (!canSubmit) return;
     const cpf = searchParams.get("cpf") ?? "";
-    navigate(`/oferta?cpf=${encodeURIComponent(cpf)}`);
+    const qs = new URLSearchParams();
+    if (cpf) qs.set("cpf", cpf);
+    if (nomeParam) qs.set("nome", nomeParam);
+    navigate(`/oferta?${qs.toString()}`);
   };
 
   return (

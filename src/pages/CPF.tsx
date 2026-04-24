@@ -24,7 +24,12 @@ const CPF = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!isValid) return;
-    navigate(`/analise?cpf=${encodeURIComponent(cpf)}`);
+    const incoming = new URLSearchParams(window.location.search);
+    const qs = new URLSearchParams();
+    qs.set("cpf", cpf);
+    const nome = incoming.get("nome");
+    if (nome) qs.set("nome", nome);
+    navigate(`/analise?${qs.toString()}`);
   };
 
   return (
