@@ -242,7 +242,7 @@ const Pagamento = () => {
             justifyContent: "center",
             zIndex: 60,
           }}
-          onClick={() => setShowPix(false)}
+          onClick={closePix}
         >
           <div
             onClick={(e) => e.stopPropagation()}
