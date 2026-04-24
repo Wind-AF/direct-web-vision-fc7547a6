@@ -106,24 +106,65 @@ const Analise = () => {
   const [searchParams] = useSearchParams();
   const [step1, setStep1] = useState<StepState>("loading");
   const [step2, setStep2] = useState<StepState>("loading");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    const t1 = window.setTimeout(() => setStep1("done"), 1500);
-    const t2 = window.setTimeout(() => setStep2("done"), 3000);
-    const t3 = window.setTimeout(() => {
-      const cpf = searchParams.get("cpf") ?? "";
-      const nome = searchParams.get("nome") ?? "";
-      const qs = new URLSearchParams();
-      if (cpf) qs.set("cpf", cpf);
-      if (nome) qs.set("nome", nome);
-      const q = qs.toString();
-      navigate(`/pessoa${q ? `?${q}` : ""}`, { replace: true });
-    }, 3800);
+    let cancelled = false;
+    const cpf = searchParams.get("cpf") ?? "";
+    const nomeFromUrl = searchParams.get("nome") ?? "";
+
+    const startedAt = Date.now();
+    const minDelay = (ms: number) =>
+      new Promise<void>((r) =>
+        setTimeout(r, Math.max(0, ms - (Date.now() - startedAt))),
+      );
+
+    (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("consulta-cpf", {
+          body: { cpf },
+        });
+
+        await minDelay(1500);
+        if (cancelled) return;
+        setStep1("done");
+
+        if (error || !data?.ok) {
+          const msg =
+            (data && (data.error as string)) ||
+            error?.message ||
+            "Não foi possível consultar este CPF.";
+          await minDelay(2800);
+          if (cancelled) return;
+          setErrorMsg(msg);
+          return;
+        }
+
+        await minDelay(2800);
+        if (cancelled) return;
+        setStep2("done");
+
+        const qs = new URLSearchParams();
+        if (cpf) qs.set("cpf", cpf);
+        const finalNome = (data.nome as string) || nomeFromUrl;
+        if (finalNome) qs.set("nome", finalNome);
+        if (data.nascimento) qs.set("nascimento", data.nascimento as string);
+        if (data.sexo) qs.set("sexo", data.sexo as string);
+        if (data.mae) qs.set("mae", data.mae as string);
+
+        await minDelay(3500);
+        if (cancelled) return;
+        navigate(`/pessoa?${qs.toString()}`, { replace: true });
+      } catch (e) {
+        if (cancelled) return;
+        setErrorMsg(
+          e instanceof Error ? e.message : "Erro inesperado ao consultar CPF.",
+        );
+      }
+    })();
 
     return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.clearTimeout(t3);
+      cancelled = true;
     };
   }, [navigate, searchParams]);
 
