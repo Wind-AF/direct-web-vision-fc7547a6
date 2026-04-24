@@ -11,6 +11,7 @@ import {
   X,
   Wallet,
 } from "lucide-react";
+import { useParadisePix } from "@/hooks/useParadisePix";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
