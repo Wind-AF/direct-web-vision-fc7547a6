@@ -6,8 +6,7 @@ import logo from "@/assets/bancred-logo.png";
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 // Mock person data (replicating visual only — no backend)
-const PERSON = {
-  firstName: "FRANCISCO",
+const PERSON_DEFAULT = {
   fullName: "FRANCISCO VALDEMIR VIEIRA FILHO",
   birthDate: "05/02/2004",
   sex: "M",
