@@ -215,6 +215,7 @@ const Dashboard = () => {
           <button
             key={label}
             type="button"
+            onClick={label === "Sacar agora" ? goSaque : undefined}
             style={{
               background: "transparent",
               border: "none",
@@ -272,6 +273,7 @@ const Dashboard = () => {
           <h2 style={{ fontSize: 16, fontWeight: 700, color: "#111827" }}>Seu Empréstimo</h2>
           <button
             type="button"
+            onClick={goSaque}
             style={{
               background: "#1C68E3",
               color: "#fff",
@@ -383,6 +385,7 @@ const Dashboard = () => {
           <button
             key={label}
             type="button"
+            onClick={label === "Saque" ? goSaque : undefined}
             style={{
               background: "transparent",
               border: "none",
