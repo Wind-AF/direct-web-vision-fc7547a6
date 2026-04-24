@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   User,
   Eye,
@@ -45,7 +45,9 @@ const PixIcon = ({ size = 22 }: { size?: number }) => (
 
 const Dashboard = () => {
   const [params] = useSearchParams();
+  const navigate = useNavigate();
   const [hideBalance, setHideBalance] = useState(false);
+  const goSaque = () => navigate(`/saque?${params.toString()}`);
 
   const valor = Number(params.get("valor") || 5000);
   const nomeRaw = params.get("nome") || "";
