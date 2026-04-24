@@ -78,20 +78,6 @@ export function useParadisePix(onApproved?: () => void) {
       setPix(pixData);
       setStatus("pending");
 
-      // Polling a cada 2s
-      pollRef.current = window.setInterval(async () => {
-        try {
-          const { data: st } = await supabase.functions.invoke("paradise-check-status", {
-            body: null,
-            method: "GET",
-          } as never);
-          // fallback: usar fetch direto via invoke não suporta query string facilmente; usar URL manual
-        } catch {
-          /* noop */
-        }
-      }, 2000);
-      // Substituir polling acima por implementação com fetch direto à edge function
-      if (pollRef.current) clearInterval(pollRef.current);
       const projectUrl = import.meta.env.VITE_SUPABASE_URL as string;
       const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
       pollRef.current = window.setInterval(async () => {
