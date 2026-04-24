@@ -15,6 +15,25 @@ const formatCPF = (value: string) => {
   return out;
 };
 
+// Valida CPF pelo algoritmo dos dígitos verificadores (Receita Federal)
+const isValidCPF = (raw: string) => {
+  const cpf = raw.replace(/\D/g, "");
+  if (cpf.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(cpf)) return false; // todos iguais
+
+  const calcDigit = (sliceLen: number) => {
+    let sum = 0;
+    for (let i = 0; i < sliceLen; i++) {
+      sum += parseInt(cpf.charAt(i), 10) * (sliceLen + 1 - i);
+    }
+    const rest = (sum * 10) % 11;
+    return rest === 10 ? 0 : rest;
+  };
+
+  return calcDigit(9) === parseInt(cpf.charAt(9), 10) &&
+    calcDigit(10) === parseInt(cpf.charAt(10), 10);
+};
+
 const CPF = () => {
   const [cpf, setCpf] = useState("");
   const navigate = useNavigate();
