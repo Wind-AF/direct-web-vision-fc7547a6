@@ -68,6 +68,16 @@ const Pagamento = () => {
     }
   }, [showPix]);
 
+  // Simula confirmação do pagamento e segue para o primeiro upsell (IOF)
+  useEffect(() => {
+    if (showPix && !pixLoading) {
+      const t = setTimeout(() => {
+        navigate(`/up1?${params.toString()}`);
+      }, 12000);
+      return () => clearTimeout(t);
+    }
+  }, [showPix, pixLoading, navigate, params]);
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(PIX_PAYLOAD);
