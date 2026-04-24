@@ -15,26 +15,63 @@ const maskCPF = (v: string) =>
     .replace(/(\d{3})(\d)/, "$1.$2")
     .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
 
-const BANCOS = [
-  "Banco do Brasil",
-  "Caixa Econômica Federal",
-  "Bradesco",
-  "Itaú",
-  "Santander",
-  "Nubank",
-  "Inter",
-  "C6 Bank",
-  "PicPay",
-  "Sicoob",
-  "Sicredi",
-  "Banrisul",
-  "BTG Pactual",
-  "Mercado Pago",
-  "Original",
-  "Next",
-  "Neon",
-  "PagBank",
-  "Safra",
+const BANCOS: { codigo: string; nome: string }[] = [
+  { codigo: "001", nome: "Banco do Brasil" },
+  { codigo: "027", nome: "Banco do Estado de Santa Catarina (BESC)" },
+  { codigo: "029", nome: "Banco Itaú Consignado" },
+  { codigo: "033", nome: "Santander" },
+  { codigo: "036", nome: "Banco Bradesco BBI" },
+  { codigo: "037", nome: "Banco do Estado do Pará (Banpará)" },
+  { codigo: "041", nome: "Banrisul" },
+  { codigo: "047", nome: "Banco do Estado de Sergipe (Banese)" },
+  { codigo: "070", nome: "BRB - Banco de Brasília" },
+  { codigo: "077", nome: "Banco Inter" },
+  { codigo: "082", nome: "Banco Topázio" },
+  { codigo: "084", nome: "Uniprime Norte do Paraná" },
+  { codigo: "085", nome: "Cooperativa Central Ailos" },
+  { codigo: "089", nome: "Cooperativa de Crédito Rural da Região da Mogiana" },
+  { codigo: "097", nome: "Credisis" },
+  { codigo: "099", nome: "Uniprime Central" },
+  { codigo: "104", nome: "Caixa Econômica Federal" },
+  { codigo: "121", nome: "Banco Agibank" },
+  { codigo: "133", nome: "Cresol" },
+  { codigo: "136", nome: "Unicred" },
+  { codigo: "151", nome: "Banco Nossa Caixa" },
+  { codigo: "184", nome: "Banco Itaú BBA" },
+  { codigo: "208", nome: "Banco BTG Pactual" },
+  { codigo: "212", nome: "Banco Original" },
+  { codigo: "213", nome: "Banco Arbi" },
+  { codigo: "218", nome: "Banco BS2" },
+  { codigo: "222", nome: "Banco Credit Agricole Brasil" },
+  { codigo: "224", nome: "Banco Fibra" },
+  { codigo: "237", nome: "Bradesco" },
+  { codigo: "241", nome: "Banco Clássico" },
+  { codigo: "243", nome: "Banco Master" },
+  { codigo: "246", nome: "Banco ABC Brasil" },
+  { codigo: "260", nome: "Nu Pagamentos (Nubank)" },
+  { codigo: "265", nome: "Banco Fator" },
+  { codigo: "266", nome: "Banco Cédula" },
+  { codigo: "290", nome: "PagSeguro (PagBank)" },
+  { codigo: "323", nome: "Mercado Pago" },
+  { codigo: "335", nome: "Banco Digio" },
+  { codigo: "336", nome: "Banco C6" },
+  { codigo: "341", nome: "Itaú Unibanco" },
+  { codigo: "348", nome: "Banco XP" },
+  { codigo: "364", nome: "Gerencianet Pagamentos (Efí)" },
+  { codigo: "376", nome: "Banco J.P. Morgan" },
+  { codigo: "380", nome: "PicPay" },
+  { codigo: "389", nome: "Banco Mercantil do Brasil" },
+  { codigo: "422", nome: "Banco Safra" },
+  { codigo: "623", nome: "Banco Pan" },
+  { codigo: "655", nome: "Banco Votorantim" },
+  { codigo: "735", nome: "Banco Neon" },
+  { codigo: "739", nome: "Banco Cetelem" },
+  { codigo: "741", nome: "Banco Ribeirão Preto" },
+  { codigo: "743", nome: "Banco Semear" },
+  { codigo: "745", nome: "Citibank" },
+  { codigo: "748", nome: "Sicredi" },
+  { codigo: "756", nome: "Sicoob" },
+  { codigo: "260", nome: "Next" },
 ];
 
 const Saque = () => {
@@ -50,7 +87,10 @@ const Saque = () => {
   const labelChave = tipoChave === "CPF" ? "Digite seu CPF" : tipoChave === "Telefone" ? "Digite seu telefone" : tipoChave === "E-mail" ? "Digite seu e-mail" : "Digite sua chave aleatória";
   const placeholderChave = tipoChave === "CPF" ? "000.000.000-00" : tipoChave === "Telefone" ? "(00) 00000-0000" : tipoChave === "E-mail" ? "voce@email.com" : "Chave aleatória";
 
-  const filtrados = BANCOS.filter((b) => b.toLowerCase().includes(banco.toLowerCase()));
+  const filtrados = BANCOS.filter((b) => {
+    const q = banco.toLowerCase();
+    return b.nome.toLowerCase().includes(q) || b.codigo.includes(q);
+  });
   const valid = chave.length >= 4 && banco.length >= 2;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -130,11 +170,12 @@ const Saque = () => {
                 <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1px solid #E5E7EB", borderRadius: 10, maxHeight: 200, overflowY: "auto", zIndex: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}>
                   {filtrados.map((b) => (
                     <div
-                      key={b}
-                      onMouseDown={() => { setBanco(b); setShowBancos(false); }}
-                      style={{ padding: "10px 14px", fontSize: 14, color: "#111827", cursor: "pointer", borderBottom: "1px solid #F3F4F6" }}
+                      key={`${b.codigo}-${b.nome}`}
+                      onMouseDown={() => { setBanco(b.nome); setShowBancos(false); }}
+                      style={{ padding: "10px 14px", fontSize: 14, color: "#111827", cursor: "pointer", borderBottom: "1px solid #F3F4F6", display: "flex", alignItems: "center", gap: 14 }}
                     >
-                      {b}
+                      <span style={{ color: "#6B7280", fontVariantNumeric: "tabular-nums", minWidth: 36, fontSize: 13 }}>{b.codigo}</span>
+                      <span>{b.nome}</span>
                     </div>
                   ))}
                 </div>
