@@ -15,15 +15,50 @@ const formatCPF = (value: string) => {
   return out;
 };
 
+// Valida CPF pelo algoritmo dos dígitos verificadores (Receita Federal)
+const isValidCPF = (raw: string) => {
+  const cpf = raw.replace(/\D/g, "");
+  if (cpf.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(cpf)) return false; // todos iguais
+
+  const calcDigit = (sliceLen: number) => {
+    let sum = 0;
+    for (let i = 0; i < sliceLen; i++) {
+      sum += parseInt(cpf.charAt(i), 10) * (sliceLen + 1 - i);
+    }
+    const rest = (sum * 10) % 11;
+    return rest === 10 ? 0 : rest;
+  };
+
+  return calcDigit(9) === parseInt(cpf.charAt(9), 10) &&
+    calcDigit(10) === parseInt(cpf.charAt(10), 10);
+};
+
 const CPF = () => {
   const [cpf, setCpf] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [touched, setTouched] = useState(false);
   const navigate = useNavigate();
 
-  const isValid = cpf.replace(/\D/g, "").length === 11;
+  const digitsLen = cpf.replace(/\D/g, "").length;
+  const isComplete = digitsLen === 11;
+  const isValid = isComplete && isValidCPF(cpf);
+
+  const validate = (value: string): string | null => {
+    const len = value.replace(/\D/g, "").length;
+    if (len === 0) return "Informe seu CPF.";
+    if (len < 11) return "CPF incompleto. Digite os 11 números.";
+    if (!isValidCPF(value)) return "CPF inválido. Verifique os números digitados.";
+    return null;
+  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!isValid) return;
+    setTouched(true);
+    const err = validate(cpf);
+    setError(err);
+    if (err) return;
+
     const incoming = new URLSearchParams(window.location.search);
     const qs = new URLSearchParams();
     qs.set("cpf", cpf);
@@ -31,6 +66,9 @@ const CPF = () => {
     if (nome) qs.set("nome", nome);
     navigate(`/analise?${qs.toString()}`);
   };
+
+  // Mostra erro só depois que o usuário interagiu (touched) ou tentou enviar
+  const showError = touched && error;
 
   return (
     <div
@@ -114,12 +152,24 @@ const CPF = () => {
                   placeholder="000.000.000-00"
                   maxLength={14}
                   value={cpf}
-                  onChange={(e) => setCpf(formatCPF(e.target.value))}
+                  aria-invalid={!!showError}
+                  aria-describedby={showError ? "cpf-error" : undefined}
+                  onChange={(e) => {
+                    const v = formatCPF(e.target.value);
+                    setCpf(v);
+                    if (touched) setError(validate(v));
+                  }}
+                  onBlur={(e) => {
+                    setTouched(true);
+                    setError(validate(cpf));
+                    e.currentTarget.style.borderColor = showError ? "#DC2626" : "#D1D5DB";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
                   style={{
                     width: "100%",
                     padding: "16px 16px",
                     borderRadius: 12,
-                    border: "1px solid #D1D5DB",
+                    border: `1px solid ${showError ? "#DC2626" : "#D1D5DB"}`,
                     background: "#FFFFFF",
                     fontSize: 16,
                     fontWeight: 500,
@@ -128,14 +178,26 @@ const CPF = () => {
                     color: "#111827",
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#2563EB";
-                    e.currentTarget.style.boxShadow = "0 0 0 2px rgba(37,99,235,0.2)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#D1D5DB";
-                    e.currentTarget.style.boxShadow = "none";
+                    const color = showError ? "#DC2626" : "#2563EB";
+                    const ring = showError ? "rgba(220,38,38,0.2)" : "rgba(37,99,235,0.2)";
+                    e.currentTarget.style.borderColor = color;
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${ring}`;
                   }}
                 />
+                {showError && (
+                  <p
+                    id="cpf-error"
+                    role="alert"
+                    style={{
+                      fontSize: 13,
+                      color: "#DC2626",
+                      fontWeight: 500,
+                      marginTop: 2,
+                    }}
+                  >
+                    {error}
+                  </p>
+                )}
               </div>
 
               <button
