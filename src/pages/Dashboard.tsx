@@ -47,7 +47,15 @@ const Dashboard = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const [hideBalance, setHideBalance] = useState(false);
+  const [tooltipLabel, setTooltipLabel] = useState<string | null>(null);
   const goSaque = () => navigate(`/saque?${params.toString()}`);
+
+  const handleLockedAction = (label: string) => {
+    setTooltipLabel(label);
+    window.setTimeout(() => {
+      setTooltipLabel((curr) => (curr === label ? null : curr));
+    }, 3000);
+  };
 
   const valor = Number(params.get("valor") || 5000);
   const nomeRaw = params.get("nome") || "";
@@ -211,53 +219,98 @@ const Dashboard = () => {
           padding: "18px 14px 6px",
         }}
       >
-        {quickActions.map(({ Icon, label, isPix }) => (
-          <button
-            key={label}
-            type="button"
-            onClick={label === "Sacar agora" ? goSaque : undefined}
-            style={{
-              background: "transparent",
-              border: "none",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 6,
-              cursor: "pointer",
-              padding: 4,
-              fontFamily: fontStack,
-            }}
-          >
-            <span
-              style={{
-                width: 54,
-                height: 54,
-                borderRadius: 16,
-                background: "#FFFFFF",
-                color: "#1C68E3",
-                border: "1px solid #E5E7EB",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 6px 14px -8px rgba(28,104,227,0.28)",
-              }}
-            >
-              {isPix ? <PixIcon size={22} /> : <Icon size={20} />}
-            </span>
-            <span
-              style={{
-                fontSize: 11.5,
-                color: "#111827",
-                textAlign: "center",
-                lineHeight: 1.2,
-                fontWeight: 600,
-                letterSpacing: -0.1,
-              }}
-            >
-              {label}
-            </span>
-          </button>
-        ))}
+        {quickActions.map(({ Icon, label, isPix }) => {
+          const isLocked = label !== "Sacar agora";
+          const showTip = tooltipLabel === label;
+          return (
+            <div key={label} style={{ position: "relative", display: "flex", justifyContent: "center" }}>
+              {showTip && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "calc(100% + 10px)",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: "#F97316",
+                    color: "#fff",
+                    padding: "10px 12px",
+                    borderRadius: 10,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    lineHeight: 1.35,
+                    width: 200,
+                    textAlign: "left",
+                    boxShadow: "0 10px 24px rgba(249,115,22,0.35)",
+                    zIndex: 20,
+                    fontFamily: fontStack,
+                  }}
+                >
+                  Para liberar esta funcionalidade, efetue primeiro o seu saque.
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: 0,
+                      height: 0,
+                      borderLeft: "7px solid transparent",
+                      borderRight: "7px solid transparent",
+                      borderTop: "8px solid #F97316",
+                    }}
+                  />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={isLocked ? () => handleLockedAction(label) : goSaque}
+                style={{
+                  background: "transparent",
+                  border: showTip ? "1.5px solid #1C68E3" : "1.5px solid transparent",
+                  borderRadius: 18,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 6,
+                  cursor: "pointer",
+                  padding: 6,
+                  fontFamily: fontStack,
+                  width: "100%",
+                  transition: "border-color 0.2s",
+                }}
+              >
+                <span
+                  style={{
+                    width: 54,
+                    height: 54,
+                    borderRadius: 16,
+                    background: "#FFFFFF",
+                    color: "#1C68E3",
+                    border: "1px solid #E5E7EB",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 6px 14px -8px rgba(28,104,227,0.28)",
+                  }}
+                >
+                  {isPix ? <PixIcon size={22} /> : <Icon size={20} />}
+                </span>
+                <span
+                  style={{
+                    fontSize: 11.5,
+                    color: "#111827",
+                    textAlign: "center",
+                    lineHeight: 1.2,
+                    fontWeight: 600,
+                    letterSpacing: -0.1,
+                  }}
+                >
+                  {label}
+                </span>
+              </button>
+            </div>
+          );
+        })}
       </div>
 
       <section
