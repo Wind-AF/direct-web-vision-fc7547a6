@@ -180,7 +180,7 @@ const Oferta = () => {
     qs.set("valor", String(valor));
     qs.set("parcelas", String(parcelas));
     qs.set("melhor_dia", String(melhorDia));
-    navigate(`/simulacao?${qs.toString()}`);
+    navigate(`/aprovado?${qs.toString()}`);
   };
 
   const handleBack = () => {
