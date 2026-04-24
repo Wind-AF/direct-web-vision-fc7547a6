@@ -47,7 +47,15 @@ const Dashboard = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const [hideBalance, setHideBalance] = useState(false);
+  const [tooltipLabel, setTooltipLabel] = useState<string | null>(null);
   const goSaque = () => navigate(`/saque?${params.toString()}`);
+
+  const handleLockedAction = (label: string) => {
+    setTooltipLabel(label);
+    window.setTimeout(() => {
+      setTooltipLabel((curr) => (curr === label ? null : curr));
+    }, 3000);
+  };
 
   const valor = Number(params.get("valor") || 5000);
   const nomeRaw = params.get("nome") || "";
