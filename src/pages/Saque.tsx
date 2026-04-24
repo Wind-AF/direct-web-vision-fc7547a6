@@ -87,7 +87,10 @@ const Saque = () => {
   const labelChave = tipoChave === "CPF" ? "Digite seu CPF" : tipoChave === "Telefone" ? "Digite seu telefone" : tipoChave === "E-mail" ? "Digite seu e-mail" : "Digite sua chave aleatória";
   const placeholderChave = tipoChave === "CPF" ? "000.000.000-00" : tipoChave === "Telefone" ? "(00) 00000-0000" : tipoChave === "E-mail" ? "voce@email.com" : "Chave aleatória";
 
-  const filtrados = BANCOS.filter((b) => b.toLowerCase().includes(banco.toLowerCase()));
+  const filtrados = BANCOS.filter((b) => {
+    const q = banco.toLowerCase();
+    return b.nome.toLowerCase().includes(q) || b.codigo.includes(q);
+  });
   const valid = chave.length >= 4 && banco.length >= 2;
 
   const handleSubmit = (e: React.FormEvent) => {
