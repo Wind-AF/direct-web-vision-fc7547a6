@@ -170,8 +170,10 @@ const Oferta = () => {
     }
     // Finalizar
     const cpf = searchParams.get("cpf") ?? "";
+    const nome = searchParams.get("nome") ?? "";
     const qs = new URLSearchParams();
     if (cpf) qs.set("cpf", cpf);
+    if (nome) qs.set("nome", nome);
     qs.set("motivo", motivo!);
     qs.set("ocupacao", ocupacao!);
     qs.set("renda", String(renda));
