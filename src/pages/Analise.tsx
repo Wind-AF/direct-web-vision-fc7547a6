@@ -334,6 +334,42 @@ const Analise = () => {
                 <Step label="Finalizando verificação" state={step2} />
               </div>
 
+              {errorMsg && (
+                <div
+                  style={{
+                    marginTop: 16,
+                    padding: 14,
+                    borderRadius: 12,
+                    background: "#FEF2F2",
+                    border: "1px solid #FECACA",
+                    color: "#991B1B",
+                    fontSize: 14,
+                  }}
+                >
+                  <strong style={{ display: "block", marginBottom: 4 }}>
+                    Não foi possível continuar
+                  </strong>
+                  <span style={{ color: "#7F1D1D" }}>{errorMsg}</span>
+                  <button
+                    onClick={() => navigate("/cpf")}
+                    style={{
+                      marginTop: 12,
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: 10,
+                      background: "#DC2626",
+                      color: "#FFFFFF",
+                      border: "none",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontFamily: fontStack,
+                    }}
+                  >
+                    Tentar outro CPF
+                  </button>
+                </div>
+              )}
+
               {/* Secure connection badge */}
               <div style={{ marginTop: 24, textAlign: "center" }}>
                 <div
