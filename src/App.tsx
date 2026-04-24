@@ -9,6 +9,7 @@ import CPF from "./pages/CPF.tsx";
 import Pessoa from "./pages/Pessoa.tsx";
 import Analise from "./pages/Analise.tsx";
 import Oferta from "./pages/Oferta.tsx";
+import Analisando from "./pages/Analisando.tsx";
 import Aprovado from "./pages/Aprovado.tsx";
 import Endereco from "./pages/Endereco.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/analise" element={<Analise />} />
           <Route path="/pessoa" element={<Pessoa />} />
           <Route path="/oferta" element={<Oferta />} />
+          <Route path="/analisando" element={<Analisando />} />
           <Route path="/aprovado" element={<Aprovado />} />
           <Route path="/endereco" element={<Endereco />} />
           <Route path="/simulacao" element={<Simulacao />} />
