@@ -41,8 +41,20 @@ Deno.serve(async (req) => {
     if (!PARADISE_PRODUCT_HASH) throw new Error("PARADISE_PRODUCT_HASH ausente");
 
     const body = (await req.json()) as CreatePixRequest;
-    if (!body?.amount || body.amount < 1) throw new Error("amount (centavos) inválido");
-    if (!body?.stage) throw new Error("stage obrigatório");
+    if (!body?.amount || !Number.isFinite(body.amount) || body.amount < 1) {
+      throw new Error("amount (centavos) inválido");
+    }
+    // Cap amount at R$ 500,00 (50000 centavos) to prevent abuse
+    if (body.amount > 50000) {
+      throw new Error("amount excede o limite permitido");
+    }
+    const ALLOWED_STAGES = ["seguro", "iof", "up2", "up3"];
+    if (!body?.stage || !ALLOWED_STAGES.includes(body.stage)) {
+      throw new Error("stage inválido");
+    }
+    if (body.description && (typeof body.description !== "string" || body.description.length > 200)) {
+      throw new Error("description inválida");
+    }
 
     const customer = gerarCustomer(body.customer);
     const reference = `${body.stage}_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
