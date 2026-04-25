@@ -8,16 +8,55 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+// Simple in-memory rate limiting per IP (best-effort; resets on cold start)
+const rateMap = new Map<string, { count: number; reset: number }>();
+const RATE_LIMIT = 10; // requests
+const RATE_WINDOW_MS = 60_000; // per minute
+
+function checkRate(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateMap.get(ip);
+  if (!entry || entry.reset < now) {
+    rateMap.set(ip, { count: 1, reset: now + RATE_WINDOW_MS });
+    return true;
+  }
+  entry.count++;
+  if (entry.count > RATE_LIMIT) return false;
+  return true;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Rate limiting per IP
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+      req.headers.get("cf-connecting-ip") ||
+      "unknown";
+    if (!checkRate(ip)) {
+      return new Response(
+        JSON.stringify({ error: "Muitas requisições. Tente novamente em instantes." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    // Validate JWT (anon or authenticated) — blocks direct unauthenticated calls
+    const authHeader = req.headers.get("Authorization") || "";
+    if (!authHeader.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const token = Deno.env.get("AMNESIA_API_TOKEN");
     if (!token) {
+      console.error("AMNESIA_API_TOKEN não configurada");
       return new Response(
-        JSON.stringify({ error: "AMNESIA_API_TOKEN não configurada" }),
+        JSON.stringify({ error: "Configuração indisponível" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
@@ -49,12 +88,8 @@ Deno.serve(async (req) => {
     if (!upstream.ok) {
       console.error("amnesiatecnologia erro", upstream.status, text);
       return new Response(
-        JSON.stringify({
-          error: "Falha ao consultar CPF",
-          status: upstream.status,
-          details: data,
-        }),
-        { status: upstream.status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        JSON.stringify({ error: "Falha ao consultar CPF" }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -89,8 +124,9 @@ Deno.serve(async (req) => {
     const mae = pick("nome_mae", "mae", "nomeMae", "NOME_MAE", "NOME_MAE_PF", "motherName");
 
     if (!nome) {
+      console.error("CPF não encontrado", rawCpf);
       return new Response(
-        JSON.stringify({ error: "CPF não encontrado", details: payload }),
+        JSON.stringify({ error: "CPF não encontrado" }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
@@ -103,15 +139,13 @@ Deno.serve(async (req) => {
         nascimento,
         sexo,
         mae,
-        raw: payload,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (err) {
     console.error("consulta-cpf erro inesperado", err);
-    const message = err instanceof Error ? err.message : "Erro desconhecido";
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: "Erro ao processar requisição" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
