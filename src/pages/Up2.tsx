@@ -48,7 +48,7 @@ const Up2 = () => {
   const [copied, setCopied] = useState(false);
 
   const { create, reset, pix, loading: pixLoading, error: pixError } = useParadisePix(() => {
-    // Próximo passo após pagamento da NF-e (a definir)
+    navigate(`/up3?${params.toString()}`);
   });
 
   const openPix = async () => {
