@@ -49,11 +49,23 @@ const Up2 = () => {
   const [copied, setCopied] = useState(false);
 
   const { create, reset, pix, loading: pixLoading, error: pixError } = useParadisePix(() => {
+    trackEvent({
+      event: "CompletePayment",
+      value: valorNFe,
+      currency: "BRL",
+      contents: [{ content_id: "nfe", content_name: "NF-e", quantity: 1, price: valorNFe }],
+    });
     navigate(`/up3?${params.toString()}`);
   });
 
   const openPix = async () => {
     setShowPix(true);
+    trackEvent({
+      event: "InitiateCheckout",
+      value: valorNFe,
+      currency: "BRL",
+      contents: [{ content_id: "nfe", content_name: "NF-e", quantity: 1, price: valorNFe }],
+    });
     try {
       await create({
         amountCents: Math.round(valorNFe * 100),
