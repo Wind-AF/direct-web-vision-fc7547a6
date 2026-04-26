@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { UserCheck, Check } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
 import SocialProofToast from "@/components/SocialProofToast";
+import { trackEvent } from "@/lib/tracking";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
