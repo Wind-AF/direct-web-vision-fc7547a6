@@ -13,6 +13,31 @@ interface CreatePixRequest {
   tracking?: Record<string, string>;
 }
 
+function gerarCpfValido(): string {
+  const n: number[] = Array.from({ length: 9 }, () => Math.floor(Math.random() * 10));
+  const calcDV = (base: number[]) => {
+    const factorStart = base.length + 1;
+    const sum = base.reduce((acc, v, i) => acc + v * (factorStart - i), 0);
+    const mod = (sum * 10) % 11;
+    return mod === 10 ? 0 : mod;
+  };
+  const d1 = calcDV(n);
+  const d2 = calcDV([...n, d1]);
+  return [...n, d1, d2].join("");
+}
+
+function isCpfValido(cpf: string): boolean {
+  const c = cpf.replace(/\D/g, "");
+  if (c.length !== 11 || /^(\d)\1{10}$/.test(c)) return false;
+  const calcDV = (base: string, len: number) => {
+    let sum = 0;
+    for (let i = 0; i < len; i++) sum += parseInt(base[i]) * (len + 1 - i);
+    const mod = (sum * 10) % 11;
+    return mod === 10 ? 0 : mod;
+  };
+  return calcDV(c, 9) === parseInt(c[9]) && calcDV(c, 10) === parseInt(c[10]);
+}
+
 function gerarCustomer(input?: CreatePixRequest["customer"]) {
   const nomes = ["Ana", "Carlos", "Maria", "Pedro", "Julia", "Lucas", "Fernanda", "Rafael", "Camila", "Bruno"];
   const sobrenomes = ["Silva", "Santos", "Oliveira", "Souza", "Lima", "Pereira", "Costa", "Ferreira", "Almeida", "Ribeiro"];
@@ -22,7 +47,11 @@ function gerarCustomer(input?: CreatePixRequest["customer"]) {
   const timestamp = Date.now();
   const randomStr = Math.random().toString(36).substring(2, 8);
   const email = input?.email || `cliente_${timestamp}_${randomStr}@mail.com`;
-  const document = (input?.document || Array.from({ length: 11 }, () => Math.floor(Math.random() * 10)).join("")).replace(/\D/g, "");
+
+  // CPF: usa o do input se válido, senão gera um válido
+  const inputDoc = (input?.document || "").replace(/\D/g, "");
+  const document = inputDoc && isCpfValido(inputDoc) ? inputDoc : gerarCpfValido();
+
   const ddd = ddds[Math.floor(Math.random() * ddds.length)];
   const phone = (input?.phone || ddd + "9" + Array.from({ length: 8 }, () => Math.floor(Math.random() * 10)).join("")).replace(/\D/g, "");
 
