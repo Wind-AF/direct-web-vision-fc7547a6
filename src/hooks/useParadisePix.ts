@@ -128,7 +128,7 @@ export function useParadisePix(onApproved?: () => void) {
         } catch {
           /* noop */
         }
-      }, 2000);
+      }, 5000);
 
       // Parar após 15min
       stopRef.current = window.setTimeout(() => stopPolling(), 15 * 60 * 1000);
