@@ -13,38 +13,55 @@ const PartnerBanksFooter = ({ variant = "dark" }: PartnerBanksFooterProps) => {
   const isLight = variant === "light";
   if (isLight) {
     return (
-      <footer
-        style={{
-          background: "#F1F5F9",
-          padding: "20px 16px calc(24px + env(safe-area-inset-bottom))",
-          textAlign: "center",
-          fontFamily: fontStack,
-        }}
-      >
+      <footer style={{ fontFamily: fontStack }}>
         <div
           style={{
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: 1.4,
-            color: "#94A3B8",
-            marginBottom: 14,
+            background: "#F1F5F9",
+            padding: "20px 16px 24px",
+            textAlign: "center",
           }}
         >
-          BANCOS PARCEIROS
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: 1.4,
+              color: "#94A3B8",
+              marginBottom: 14,
+            }}
+          >
+            BANCOS PARCEIROS
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 22,
+              flexWrap: "wrap",
+            }}
+          >
+            <img src={itau} alt="Itaú" style={{ height: 28, width: "auto", objectFit: "contain" }} />
+            <img src={santander} alt="Santander" style={{ height: 18, width: "auto", objectFit: "contain" }} />
+            <img src={bradesco} alt="Bradesco" style={{ height: 16, width: "auto", objectFit: "contain" }} />
+            <img src={nubank} alt="Nubank" style={{ height: 22, width: "auto", objectFit: "contain" }} />
+          </div>
         </div>
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 22,
-            flexWrap: "wrap",
+            background: "#111827",
+            color: "#D1D5DB",
+            padding: "20px 16px calc(20px + env(safe-area-inset-bottom))",
+            textAlign: "center",
           }}
         >
-          <img src={itau} alt="Itaú" style={{ height: 28, width: "auto", objectFit: "contain" }} />
-          <img src={santander} alt="Santander" style={{ height: 18, width: "auto", objectFit: "contain" }} />
-          <img src={bradesco} alt="Bradesco" style={{ height: 16, width: "auto", objectFit: "contain" }} />
-          <img src={nubank} alt="Nubank" style={{ height: 22, width: "auto", objectFit: "contain" }} />
+          <div style={{ fontSize: 14, color: "#9CA3AF", marginBottom: 4 }}>
+            © 2026 Bancred LTDA. Todos os direitos reservados.
+          </div>
+          <div style={{ fontSize: 14, color: "#6B7280", marginBottom: 4 }}>CNPJ 41.906.644/0001-20</div>
+          <p style={{ fontSize: 12, color: "#6B7280" }}>
+            Empréstimos rápidos e seguros para realizar seus sonhos
+          </p>
         </div>
       </footer>
     );
