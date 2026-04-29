@@ -18,6 +18,8 @@ import {
   DollarSign,
   Calendar,
   ChevronLeft,
+  Lock,
+  ShieldCheck,
 } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
 import ConsultorCard from "@/components/ConsultorCard";
