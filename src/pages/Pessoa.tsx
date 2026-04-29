@@ -310,6 +310,7 @@ const Pessoa = () => {
           </form>
         </div>
       </main>
+      <PartnerBanksFooter />
     </div>
   );
 };
