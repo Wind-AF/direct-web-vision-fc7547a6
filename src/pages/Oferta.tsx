@@ -157,7 +157,7 @@ const Oferta = () => {
     switch (step) {
       case 1: return !!motivo;
       case 2: return !!ocupacao;
-      case 3: return renda > 0 && /^\d{1,2}$/.test(diaRecebimento) && +diaRecebimento >= 1 && +diaRecebimento <= 31;
+      case 3: return renda > 0;
       case 4: return !!situacaoCpf;
       case 5: return valor >= 1000 && !!parcelas;
       case 6: return !!melhorDia;
@@ -312,63 +312,6 @@ const Oferta = () => {
             placeholder="R$ 0,00"
             value={rendaText}
             onChange={(e) => setRendaText(formatRendaInput(e.target.value))}
-            style={{
-              width: "100%",
-              height: 48,
-              borderRadius: 12,
-              border: "1px solid #CBD5E1",
-              background: "#FFFFFF",
-              padding: "0 16px",
-              fontSize: 16,
-              color: "#0F172A",
-              outline: "none",
-              fontFamily: fontStack,
-              boxSizing: "border-box",
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = "#3B82F6";
-              e.currentTarget.style.boxShadow = "0 0 0 2px rgba(59,130,246,0.4)";
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = "#CBD5E1";
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          />
-        </div>
-
-        <div>
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 8 }}>
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: "50%",
-                background: "#DBEAFE",
-                color: "#2563EB",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-            >
-              <Calendar width={20} height={20} />
-            </div>
-            <div>
-              <p style={{ fontWeight: 600, color: "#0F172A", fontSize: 15 }}>Dia de recebimento</p>
-              <p style={{ fontSize: 12, color: "#64748B" }}>
-                Que dia do mês você costuma receber sua renda?
-                <br />
-                (salário, benefício, aposentadoria, etc.)
-              </p>
-            </div>
-          </div>
-          <input
-            type="text"
-            inputMode="numeric"
-            maxLength={2}
-            placeholder="Ex.: 25"
-            value={diaRecebimento}
-            onChange={(e) => setDiaRecebimento(e.target.value.replace(/\D/g, ""))}
             style={{
               width: "100%",
               height: 48,
