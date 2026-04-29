@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { UserCheck, Check, Loader2 } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
+import ConsultorCard from "@/components/ConsultorCard";
 import { supabase } from "@/integrations/supabase/client";
 import PartnerBanksFooter from "@/components/PartnerBanksFooter";
 
@@ -221,6 +222,9 @@ const Analise = () => {
         }}
       >
         <div style={{ maxWidth: 448, margin: "0 auto" }}>
+          <div style={{ marginBottom: 16 }}>
+            <ConsultorCard />
+          </div>
           {/* Card with gradient */}
           <div
             style={{

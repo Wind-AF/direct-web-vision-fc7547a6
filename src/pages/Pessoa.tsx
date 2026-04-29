@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { User, Calendar, SquareUserRound, Users, Mail, Phone } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
 import PartnerBanksFooter from "@/components/PartnerBanksFooter";
+import ConsultorCard from "@/components/ConsultorCard";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -171,6 +172,9 @@ const Pessoa = () => {
       </header>
 
       <main style={{ padding: "20px 16px 110px", maxWidth: 480, margin: "0 auto" }}>
+        <div style={{ marginBottom: 16 }}>
+          <ConsultorCard />
+        </div>
         <h1
           style={{
             fontSize: 22,
