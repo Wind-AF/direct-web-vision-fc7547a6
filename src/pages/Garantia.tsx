@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Wallet, Clock, Volume2, AlertCircle, ShieldCheck, Award, Car, CheckCircle2, Info } from "lucide-react";
+import { Wallet, Clock, ShieldCheck, Award, CheckCircle2 } from "lucide-react";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -11,29 +10,10 @@ const Garantia = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const valor = Number(params.get("valor") || 5000);
-  const [selected, setSelected] = useState<"seguro" | "bem" | null>(null);
 
   const handleContinue = () => {
-    if (!selected) return;
-    if (selected === "seguro") {
-      navigate(`/pagamento?${params.toString()}`);
-    } else {
-      navigate(`/agendamento?${params.toString()}`);
-    }
+    navigate(`/pagamento?${params.toString()}`);
   };
-
-  const optionStyle = (key: "seguro" | "bem") => ({
-    width: "100%",
-    background: "#FFFFFF",
-    border: `2px solid ${selected === key ? "#1C68E3" : "#E5E7EB"}`,
-    borderRadius: 14,
-    padding: 16,
-    textAlign: "left" as const,
-    cursor: "pointer",
-    marginBottom: 12,
-    transition: "border-color 0.2s",
-    fontFamily: fontStack,
-  });
 
   return (
     <div style={{ minHeight: "100dvh", background: "#F4F4F7", fontFamily: fontStack, color: "#111827" }}>
