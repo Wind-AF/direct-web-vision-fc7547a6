@@ -818,23 +818,24 @@ const Oferta = () => {
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: 10,
+                gap: 8,
                 background: "#ECFDF5",
                 border: "1px solid #A7F3D0",
                 borderRadius: 999,
-                padding: "8px 14px",
-                fontSize: 13,
+                padding: "5px 10px",
+                fontSize: 11,
                 fontWeight: 600,
                 color: "#047857",
                 fontFamily: fontStack,
+                whiteSpace: "nowrap",
               }}
             >
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                <Lock width={14} height={14} /> Site protegido por SSL
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <Lock width={11} height={11} /> Site protegido por SSL
               </span>
-              <span style={{ width: 3, height: 3, borderRadius: "50%", background: "#34D399" }} />
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                <ShieldCheck width={14} height={14} /> Autorizado pelo Bacen
+              <span style={{ width: 2, height: 2, borderRadius: "50%", background: "#34D399" }} />
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <ShieldCheck width={11} height={11} /> Autorizado pelo Bacen
               </span>
             </div>
           </div>
