@@ -16,7 +16,7 @@ const PartnerBanksFooter = ({ variant = "dark" }: PartnerBanksFooterProps) => {
       <footer style={{ fontFamily: fontStack }}>
         <div
           style={{
-            background: "#F1F5F9",
+            background: "#FFFFFF",
             padding: "20px 16px 24px",
             textAlign: "center",
           }}
