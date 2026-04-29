@@ -18,6 +18,8 @@ import {
   DollarSign,
   Calendar,
   ChevronLeft,
+  Lock,
+  ShieldCheck,
 } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
 import ConsultorCard from "@/components/ConsultorCard";
@@ -802,6 +804,38 @@ const Oferta = () => {
               >
                 {continueLabel}
               </button>
+            </div>
+          </div>
+
+          <div
+            style={{
+              marginTop: 16,
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 10,
+                background: "#ECFDF5",
+                border: "1px solid #A7F3D0",
+                borderRadius: 999,
+                padding: "8px 14px",
+                fontSize: 13,
+                fontWeight: 600,
+                color: "#047857",
+                fontFamily: fontStack,
+              }}
+            >
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <Lock width={14} height={14} /> Site protegido por SSL
+              </span>
+              <span style={{ width: 3, height: 3, borderRadius: "50%", background: "#34D399" }} />
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <ShieldCheck width={14} height={14} /> Autorizado pelo Bacen
+              </span>
             </div>
           </div>
         </div>
