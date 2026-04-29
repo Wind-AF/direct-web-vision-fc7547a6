@@ -15,6 +15,7 @@ import {
   House,
   ArrowDownToLine,
 } from "lucide-react";
+import { calcularParcelaMensal } from "@/lib/loanMath";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
