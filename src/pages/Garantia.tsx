@@ -1,5 +1,6 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Wallet, Clock, ShieldCheck, Award, CheckCircle2 } from "lucide-react";
+import bancredLogo from "@/assets/bancred-logo.png";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -18,7 +19,7 @@ const Garantia = () => {
   return (
     <div style={{ minHeight: "100dvh", background: "#F4F4F7", fontFamily: fontStack, color: "#111827" }}>
       <header style={{ background: "#fff", borderBottom: "1px solid #E5E7EB", padding: "14px 16px", textAlign: "center" }}>
-        <span style={{ fontSize: 22, fontWeight: 800, color: "#1C68E3", letterSpacing: -0.4 }}>Bancred</span>
+        <img src={bancredLogo} alt="Bancred" style={{ height: 32, display: "inline-block" }} />
       </header>
 
       <main style={{ padding: "20px 16px", maxWidth: 480, margin: "0 auto" }}>
