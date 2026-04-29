@@ -46,6 +46,52 @@ const Aprovado = () => {
     navigate(`/endereco?${qs.toString()}`);
   };
 
+  // 🎉 Confetes comemorativos ao entrar na tela de aprovação
+  useEffect(() => {
+    const colors = ["#1C68E3", "#3B82F6", "#22C55E", "#16A34A", "#60A5FA", "#86EFAC"];
+    const duration = 4000;
+    const end = Date.now() + duration;
+
+    // Disparo inicial forte (centro)
+    confetti({
+      particleCount: 120,
+      spread: 90,
+      startVelocity: 45,
+      origin: { x: 0.5, y: 0.3 },
+      colors,
+      scalar: 1,
+      ticks: 250,
+    });
+
+    // Disparos contínuos das laterais (chuva de confetes)
+    const interval = window.setInterval(() => {
+      if (Date.now() > end) {
+        window.clearInterval(interval);
+        return;
+      }
+      confetti({
+        particleCount: 6,
+        angle: 60,
+        spread: 70,
+        startVelocity: 50,
+        origin: { x: 0, y: 0.4 },
+        colors,
+        ticks: 300,
+      });
+      confetti({
+        particleCount: 6,
+        angle: 120,
+        spread: 70,
+        startVelocity: 50,
+        origin: { x: 1, y: 0.4 },
+        colors,
+        ticks: 300,
+      });
+    }, 220);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
   return (
     <div
       style={{
