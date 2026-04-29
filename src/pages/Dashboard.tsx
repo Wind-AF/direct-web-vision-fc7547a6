@@ -15,6 +15,7 @@ import {
   House,
   ArrowDownToLine,
 } from "lucide-react";
+import { calcularParcelaMensal } from "@/lib/loanMath";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -68,10 +69,7 @@ const Dashboard = () => {
   })();
 
   const parcelas = Number(params.get("parcelas") || 36);
-  const parcelaMensal = (() => {
-    const i = 0.022;
-    return (valor * i) / (1 - Math.pow(1 + i, -parcelas));
-  })();
+  const parcelaMensal = calcularParcelaMensal(valor, parcelas);
 
   const quickActions = [
     { Icon: ArrowUpRight, label: "Sacar agora" },

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
 import ConsultorCard from "@/components/ConsultorCard";
+import { calcularParcelaMensal } from "@/lib/loanMath";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -29,19 +30,11 @@ const Aprovado = () => {
   const nomeRaw = params.get("nome") || "";
   const primeiroNome = (nomeRaw.split(" ")[0] || "Cliente").toUpperCase();
 
-  // Mesma lógica da página /oferta — fator promocional por nº de parcelas
-  const parcelaMensal = useMemo(() => {
-    const FATORES: Record<number, number> = {
-      12: 0.0419325,
-      24: 0.0223635,
-      36: 0.0158400,
-      48: 0.0126200,
-      60: 0.0107150,
-      72: 0.0094700,
-    };
-    const fator = FATORES[parcelas] ?? 0.0223635;
-    return valor * fator;
-  }, [valor, parcelas]);
+  // Mesma lógica única (src/lib/loanMath.ts) usada em /oferta e /dashboard
+  const parcelaMensal = useMemo(
+    () => calcularParcelaMensal(valor, parcelas),
+    [valor, parcelas],
+  );
 
   const primeiraParcela = useMemo(() => {
     const d = new Date();
