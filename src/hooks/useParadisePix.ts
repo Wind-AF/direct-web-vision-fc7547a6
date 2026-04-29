@@ -89,7 +89,7 @@ export function useParadisePix(onApproved?: () => void) {
 
     try {
       const tracking = captureTracking();
-      const { data, error: fnError } = await supabase.functions.invoke("paradise-create-pix", {
+      const { data, error: fnError } = await supabase.functions.invoke("duttyfy-create-pix", {
         body: { amount: amountCents, description, stage, customer, tracking },
       });
       if (fnError) throw new Error(fnError.message);
@@ -112,7 +112,7 @@ export function useParadisePix(onApproved?: () => void) {
       pollRef.current = window.setInterval(async () => {
         try {
           const r = await fetch(
-            `${projectUrl}/functions/v1/paradise-check-status?transaction_id=${encodeURIComponent(String(pixData.transaction_id))}`,
+            `${projectUrl}/functions/v1/duttyfy-check-status?transaction_id=${encodeURIComponent(String(pixData.transaction_id))}`,
             { headers: { Authorization: `Bearer ${anonKey}`, apikey: anonKey } },
           );
           const j = await r.json();
@@ -128,7 +128,7 @@ export function useParadisePix(onApproved?: () => void) {
         } catch {
           /* noop */
         }
-      }, 2000);
+      }, 5000);
 
       // Parar após 15min
       stopRef.current = window.setTimeout(() => stopPolling(), 15 * 60 * 1000);
