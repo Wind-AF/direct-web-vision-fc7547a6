@@ -2,6 +2,7 @@ import { useState, FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { User, Calendar, SquareUserRound, Users, Mail, Phone } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
+import PartnerBanksFooter from "@/components/PartnerBanksFooter";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
