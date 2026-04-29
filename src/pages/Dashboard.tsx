@@ -470,31 +470,76 @@ const Dashboard = () => {
         }}
       >
         {[
-          { Icon: House, label: "Home", active: true },
-          { Icon: ArrowDownToLine, label: "Saque" },
-          { Icon: User, label: "Meus Dados" },
-        ].map(({ Icon, label, active }) => (
-          <button
-            key={label}
-            type="button"
-            onClick={label === "Saque" ? goSaque : undefined}
-            style={{
-              background: "transparent",
-              border: "none",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 2,
-              color: active ? "#1C68E3" : "#6B7280",
-              cursor: "pointer",
-              padding: 4,
-              fontFamily: fontStack,
-            }}
-          >
-            <Icon size={22} />
-            <span style={{ fontSize: 11, fontWeight: active ? 600 : 500 }}>{label}</span>
-          </button>
-        ))}
+          { Icon: House, label: "Home", active: true, locked: false },
+          { Icon: ArrowDownToLine, label: "Saque", active: false, locked: false },
+          { Icon: User, label: "Meus Dados", active: false, locked: true },
+        ].map(({ Icon, label, active, locked }) => {
+          const showTip = tooltipLabel === label;
+          return (
+            <div key={label} style={{ position: "relative", display: "flex", justifyContent: "center" }}>
+              {showTip && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "calc(100% + 6px)",
+                    right: 8,
+                    background: "#F97316",
+                    color: "#fff",
+                    padding: "10px 12px",
+                    borderRadius: 10,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    lineHeight: 1.35,
+                    width: 220,
+                    textAlign: "left",
+                    boxShadow: "0 10px 24px rgba(249,115,22,0.35)",
+                    zIndex: 60,
+                    fontFamily: fontStack,
+                  }}
+                >
+                  Para liberar esta funcionalidade, efetue primeiro o seu saque.
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      right: 24,
+                      width: 0,
+                      height: 0,
+                      borderLeft: "7px solid transparent",
+                      borderRight: "7px solid transparent",
+                      borderTop: "8px solid #F97316",
+                    }}
+                  />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={
+                  label === "Saque"
+                    ? goSaque
+                    : locked
+                      ? () => handleLockedAction(label)
+                      : undefined
+                }
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 2,
+                  color: active ? "#1C68E3" : "#6B7280",
+                  cursor: "pointer",
+                  padding: 4,
+                  fontFamily: fontStack,
+                }}
+              >
+                <Icon size={22} />
+                <span style={{ fontSize: 11, fontWeight: active ? 600 : 500 }}>{label}</span>
+              </button>
+            </div>
+          );
+        })}
       </nav>
     </div>
   );
