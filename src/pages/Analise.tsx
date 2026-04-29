@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { UserCheck, Check, Loader2 } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
 import { supabase } from "@/integrations/supabase/client";
+import PartnerBanksFooter from "@/components/PartnerBanksFooter";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
