@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { UserCheck, Check, Loader2 } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
 import { supabase } from "@/integrations/supabase/client";
+import PartnerBanksFooter from "@/components/PartnerBanksFooter";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -401,23 +402,7 @@ const Analise = () => {
         </div>
       </main>
 
-      <footer
-        style={{
-          background: "#111827",
-          color: "#D1D5DB",
-          padding: "32px 16px calc(32px + env(safe-area-inset-bottom))",
-          borderTop: "1px solid #1F2937",
-          textAlign: "center",
-        }}
-      >
-        <div style={{ fontSize: 14, color: "#9CA3AF", marginBottom: 6 }}>
-          © 2026 Bancred LTDA. Todos os direitos reservados.
-        </div>
-        <div style={{ fontSize: 14, color: "#6B7280", marginBottom: 6 }}>CNPJ 41.906.644/0001-20</div>
-        <p style={{ fontSize: 12, color: "#6B7280" }}>
-          Empréstimos rápidos e seguros para realizar seus sonhos
-        </p>
-      </footer>
+      <PartnerBanksFooter />
     </div>
   );
 };
