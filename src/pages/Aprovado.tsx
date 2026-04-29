@@ -29,10 +29,18 @@ const Aprovado = () => {
   const nomeRaw = params.get("nome") || "";
   const primeiroNome = (nomeRaw.split(" ")[0] || "Cliente").toUpperCase();
 
+  // Mesma lógica da página /oferta — fator promocional por nº de parcelas
   const parcelaMensal = useMemo(() => {
-    const i = 0.022;
-    const pmt = (valor * i) / (1 - Math.pow(1 + i, -parcelas));
-    return pmt;
+    const FATORES: Record<number, number> = {
+      12: 0.0419325,
+      24: 0.0223635,
+      36: 0.0158400,
+      48: 0.0126200,
+      60: 0.0107150,
+      72: 0.0094700,
+    };
+    const fator = FATORES[parcelas] ?? 0.0223635;
+    return valor * fator;
   }, [valor, parcelas]);
 
   const primeiraParcela = useMemo(() => {
@@ -46,48 +54,77 @@ const Aprovado = () => {
     navigate(`/endereco?${qs.toString()}`);
   };
 
-  // 🎉 Confetes comemorativos ao entrar na tela de aprovação
+  // 🎉 Chuva intensa de confetes comemorativos ao entrar na tela de aprovação
   useEffect(() => {
-    const colors = ["#1C68E3", "#3B82F6", "#22C55E", "#16A34A", "#60A5FA", "#86EFAC"];
-    const duration = 4000;
+    const colors = ["#1C68E3", "#3B82F6", "#60A5FA", "#22C55E", "#16A34A", "#86EFAC"];
+    const duration = 6000;
     const end = Date.now() + duration;
 
-    // Disparo inicial forte (centro)
+    // Explosões iniciais fortes (3 disparos centrais)
     confetti({
-      particleCount: 120,
-      spread: 90,
-      startVelocity: 45,
+      particleCount: 250,
+      spread: 110,
+      startVelocity: 55,
       origin: { x: 0.5, y: 0.3 },
       colors,
-      scalar: 1,
-      ticks: 250,
+      ticks: 350,
+      scalar: 1.1,
+    });
+    confetti({
+      particleCount: 180,
+      spread: 140,
+      startVelocity: 45,
+      origin: { x: 0.2, y: 0.2 },
+      colors,
+      ticks: 350,
+    });
+    confetti({
+      particleCount: 180,
+      spread: 140,
+      startVelocity: 45,
+      origin: { x: 0.8, y: 0.2 },
+      colors,
+      ticks: 350,
     });
 
-    // Disparos contínuos das laterais (chuva de confetes)
+    // Chuva contínua e densa pelas laterais + topo
     const interval = window.setInterval(() => {
       if (Date.now() > end) {
         window.clearInterval(interval);
         return;
       }
+      // Esquerda
       confetti({
-        particleCount: 6,
+        particleCount: 25,
         angle: 60,
-        spread: 70,
-        startVelocity: 50,
-        origin: { x: 0, y: 0.4 },
+        spread: 80,
+        startVelocity: 55,
+        origin: { x: 0, y: Math.random() * 0.4 + 0.1 },
         colors,
-        ticks: 300,
+        ticks: 400,
       });
+      // Direita
       confetti({
-        particleCount: 6,
+        particleCount: 25,
         angle: 120,
-        spread: 70,
-        startVelocity: 50,
-        origin: { x: 1, y: 0.4 },
+        spread: 80,
+        startVelocity: 55,
+        origin: { x: 1, y: Math.random() * 0.4 + 0.1 },
         colors,
-        ticks: 300,
+        ticks: 400,
       });
-    }, 220);
+      // Caindo do topo
+      confetti({
+        particleCount: 30,
+        angle: 270,
+        spread: 180,
+        startVelocity: 25,
+        gravity: 0.6,
+        origin: { x: Math.random(), y: 0 },
+        colors,
+        ticks: 400,
+      });
+    }, 150);
 
     return () => window.clearInterval(interval);
   }, []);
