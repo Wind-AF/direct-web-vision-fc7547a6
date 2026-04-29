@@ -308,6 +308,17 @@ const Pessoa = () => {
               Continuar
             </button>
           </form>
+          <p
+            style={{
+              textAlign: "center",
+              fontSize: 12,
+              color: "#9CA3AF",
+              marginTop: 16,
+              fontFamily: fontStack,
+            }}
+          >
+            Seus dados estão protegidos e serão usados apenas para sua proposta de crédito.
+          </p>
         </div>
       </main>
       <PartnerBanksFooter />
