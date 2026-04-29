@@ -12,6 +12,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
+import ConsultorCard from "@/components/ConsultorCard";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -66,6 +67,9 @@ const Aprovado = () => {
       </header>
 
       <main style={{ padding: "24px 16px", maxWidth: 480, margin: "0 auto" }}>
+        <div style={{ marginBottom: 16 }}>
+          <ConsultorCard />
+        </div>
         <div style={{ textAlign: "center", marginBottom: 18 }}>
           <div
             style={{
