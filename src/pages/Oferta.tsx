@@ -20,6 +20,8 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import logo from "@/assets/bancred-logo.png";
+import ConsultorCard from "@/components/ConsultorCard";
+import PartnerBanksFooter from "@/components/PartnerBanksFooter";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -732,8 +734,11 @@ const Oferta = () => {
         />
       </header>
 
-      <main style={{ flex: 1, padding: "24px 16px 40px" }}>
+      <main style={{ flex: 1, padding: "20px 16px 32px" }}>
         <div style={{ maxWidth: 448, margin: "0 auto" }}>
+          <div style={{ marginBottom: 16 }}>
+            <ConsultorCard />
+          </div>
           <div
             style={{
               background: "#FFFFFF",
@@ -802,23 +807,7 @@ const Oferta = () => {
         </div>
       </main>
 
-      <footer
-        style={{
-          background: "#111827",
-          color: "#D1D5DB",
-          padding: "24px 16px calc(24px + env(safe-area-inset-bottom))",
-          borderTop: "1px solid #1F2937",
-          textAlign: "center",
-        }}
-      >
-        <div style={{ fontSize: 14, color: "#9CA3AF", marginBottom: 4 }}>
-          © 2026 Bancred LTDA. Todos os direitos reservados.
-        </div>
-        <div style={{ fontSize: 14, color: "#6B7280", marginBottom: 4 }}>CNPJ 41.906.644/0001-20</div>
-        <p style={{ fontSize: 12, color: "#6B7280" }}>
-          Empréstimos rápidos e seguros para realizar seus sonhos
-        </p>
-      </footer>
+      <PartnerBanksFooter variant="light" />
     </div>
   );
 };

@@ -5,7 +5,50 @@ import nubank from "@/assets/banco-nubank.png";
 
 const fontStack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-const PartnerBanksFooter = () => {
+interface PartnerBanksFooterProps {
+  variant?: "dark" | "light";
+}
+
+const PartnerBanksFooter = ({ variant = "dark" }: PartnerBanksFooterProps) => {
+  const isLight = variant === "light";
+  if (isLight) {
+    return (
+      <footer
+        style={{
+          background: "#F1F5F9",
+          padding: "20px 16px calc(24px + env(safe-area-inset-bottom))",
+          textAlign: "center",
+          fontFamily: fontStack,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: 1.4,
+            color: "#94A3B8",
+            marginBottom: 14,
+          }}
+        >
+          BANCOS PARCEIROS
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 22,
+            flexWrap: "wrap",
+          }}
+        >
+          <img src={itau} alt="Itaú" style={{ height: 28, width: "auto", objectFit: "contain" }} />
+          <img src={santander} alt="Santander" style={{ height: 18, width: "auto", objectFit: "contain" }} />
+          <img src={bradesco} alt="Bradesco" style={{ height: 16, width: "auto", objectFit: "contain" }} />
+          <img src={nubank} alt="Nubank" style={{ height: 22, width: "auto", objectFit: "contain" }} />
+        </div>
+      </footer>
+    );
+  }
   return (
     <footer
       style={{
